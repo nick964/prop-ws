@@ -1,9 +1,8 @@
 package com.nick.propws.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity(name = "mygroups")
 public class Group {
@@ -19,6 +18,9 @@ public class Group {
     private int role;
 
     private String icon;
+
+    @OneToMany(mappedBy = "group")
+    private List<Member> members;
 
     public Long getId() {
         return id;

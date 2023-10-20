@@ -1,5 +1,6 @@
 package com.nick.propws.controller;
 
+import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Question;
 import com.nick.propws.service.GroupService;
@@ -15,7 +16,7 @@ public class GroupController {
     GroupService groupService;
 
     @PostMapping("/create")
-    public @ResponseBody Group createGroup() {
-        return groupService.createGroup();
+    public @ResponseBody Group createGroup(@RequestBody CreateGroupReq createGroupReq) {
+        return groupService.createGroup(createGroupReq);
     }
 }
