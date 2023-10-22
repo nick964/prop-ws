@@ -2,7 +2,9 @@ package com.nick.propws.entity;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "users")
 public class User {
@@ -19,8 +21,24 @@ public class User {
 
     private String created_at;
 
+    private String password;
+
     @OneToMany(mappedBy = "user")
     private List<Member> members;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_to_roles",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 
     public Long getId() {
         return id;
@@ -68,5 +86,13 @@ public class User {
 
     public void setMembers(List<Member> members) {
         this.members = members;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
