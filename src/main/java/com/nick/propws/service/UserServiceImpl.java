@@ -3,6 +3,8 @@ package com.nick.propws.service;
 import com.nick.propws.entity.User;
 import com.nick.propws.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,5 +37,11 @@ public class UserServiceImpl implements UserService{
     public List<User> getUsers() {
         List<User> userList = userRepository.findAll();
         return userList;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found with username" + username));
+        return UserDetailsImpl.build(user);
     }
 }

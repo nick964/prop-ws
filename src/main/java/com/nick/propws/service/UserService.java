@@ -1,6 +1,8 @@
 package com.nick.propws.service;
 
 import com.nick.propws.entity.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -13,5 +15,7 @@ public interface UserService {
     Boolean checkIfUserExists(String email);
 
     List<User> getUsers();
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
 }

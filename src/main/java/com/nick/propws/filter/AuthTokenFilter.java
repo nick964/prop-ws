@@ -1,8 +1,9 @@
 package com.nick.propws.filter;
 
-package com.example.fullstackbookjwtspringboot.filter;
-
+import com.nick.propws.service.UserService;
+import com.nick.propws.util.JwtUtil;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -20,9 +21,9 @@ import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
-    private UserDetailsServiceImpl userDetailsService;
+    private UserService userDetailsService;
 
-    public AuthTokenFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
+    public AuthTokenFilter(JwtUtil jwtUtil, UserService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
     }

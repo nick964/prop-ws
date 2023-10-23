@@ -1,5 +1,6 @@
 package com.nick.propws.util;
 
+import com.nick.propws.service.UserDetailsImpl;
 import com.nick.propws.service.UserServiceImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ public class JwtUtil {
     private int jwtExpirationMs;
 
     public String generateJwtToken(Authentication authentication) {
-        UserServiceImpl userPrincipal = (UserServiceImpl) authentication.getPrincipal();
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         return Jwts.builder().setSubject((userPrincipal.getUsername())).setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
