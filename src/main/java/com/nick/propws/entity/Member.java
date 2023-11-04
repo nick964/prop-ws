@@ -21,6 +21,10 @@ public class Member {
     @JsonIgnore
     private User user;
 
+    private Long submission_status;
+
+    private Long score;
+
     @OneToMany(mappedBy = "member")
     private List<MemberAnswer> answers;
 
@@ -47,5 +51,29 @@ public class Member {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Long getSubmission_status() {
+        return submission_status;
+    }
+
+    public void setSubmission_status(Long submission_status) {
+        this.submission_status = submission_status;
+    }
+
+    public Long getScore() {
+        return score;
+    }
+
+    public void setScore(Long score) {
+        this.score = score;
+    }
+
+    public List<MemberAnswer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(List<MemberAnswer> answers) {
+        this.answers = answers;
     }
 }

@@ -1,5 +1,6 @@
 package com.nick.propws.controller;
 
+import com.nick.propws.dto.QuestionSectionDto;
 import com.nick.propws.entity.Question;
 import com.nick.propws.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class QuestionController {
     QuestionService questionService;
 
     @GetMapping("/all")
-    public @ResponseBody List<Question> getQuestions() {
+    public @ResponseBody List<QuestionSectionDto> getQuestions() {
         return questionService.getAllQuestions();
     }
 }

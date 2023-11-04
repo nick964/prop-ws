@@ -1,6 +1,7 @@
 package com.nick.propws.controller;
 
 import com.nick.propws.dto.JwtResponse;
+import com.nick.propws.dto.OauthSignup;
 import com.nick.propws.dto.SignInRequest;
 import com.nick.propws.dto.SignUpRequest;
 import com.nick.propws.entity.ERole;
@@ -22,10 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -88,5 +86,40 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
         return ResponseEntity.ok("User registered success");
+    }
+
+    @PostMapping("/oauth-register")
+    public ResponseEntity<?> oauthSignup(@RequestBody OauthSignup signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username is already taken");
+        }
+        Set<Role> roles = new HashSet<>();
+        Optional<Role> userRole = roleRepository.findByName(ERole.ROLE_USER);
+        if (userRole.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("role not found");
+        }
+        roles.add(userRole.get());
+        User user = new User();
+        user.setUsername(signUpRequest.getUsername());
+        user.setEmail(signUpRequest.getEmail());
+        user.setRoles(roles);
+        String nonHashedPass = UUID.randomUUID().toString();
+        String userPass = passwordEncoder.encode(nonHashedPass);
+        user.setPassword(userPass);
+        userRepository.save(user);
+        User saveduser = userRepository.save(user);
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(saveduser.getUsername(), nonHashedPass));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtil.generateJwtToken(authentication);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> rolesReturn = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+        JwtResponse res = new JwtResponse();
+        res.setToken(jwt);
+        res.setId(userDetails.getId());
+        res.setUsername(userDetails.getUsername());
+        res.setRoles(rolesReturn);
+        return ResponseEntity.ok(res);
     }
 }
