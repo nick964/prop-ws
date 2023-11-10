@@ -1,8 +1,11 @@
 package com.nick.propws.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity(name = "member_answers")
+@Data
 public class MemberAnswer {
 
     @Id
@@ -11,10 +14,12 @@ public class MemberAnswer {
 
     @ManyToOne
     @JoinColumn(name = "question_id", referencedColumnName = "id")
+    @JsonIgnore
     private Question question ;
 
     @ManyToOne
     @JoinColumn(name = "member_id", referencedColumnName = "id")
+    @JsonIgnore
     private Member member;
 
     private String answer;

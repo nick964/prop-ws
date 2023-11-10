@@ -5,6 +5,7 @@ import com.nick.propws.dto.QuestionSectionDto;
 import com.nick.propws.entity.Question;
 import com.nick.propws.entity.QuestionOptions;
 import com.nick.propws.repository.QuestionRepository;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,25 +30,26 @@ public class QuestionServiceImpl  implements QuestionService{
 
         String currentSection = "";
         Long count = 1L;
+        QuestionSectionDto questionSectionDto = new QuestionSectionDto();
         for(Question q : allQuestions) {
             String sec = q.getSection();
             if(!currentSection.equals(sec)) {
-                QuestionSectionDto questionSectionDto = new QuestionSectionDto();
+                if(!StringUtils.isEmpty(questionSectionDto.getName())) {
+                    questionResponse.add(questionSectionDto);
+                }
+                questionSectionDto = new QuestionSectionDto();
                 count++;
                 questionSectionDto.setName(sec);
                 questionSectionDto.setId(count);
                 questionSectionDto.getQuestions().add(mapFromQuestion(q));
+            } else  {
+                questionSectionDto.getQuestions().add(mapFromQuestion(q));
             }
 
             currentSection = sec;
-            //questionDtos.add(mapFromQuestion(q));
         }
+        questionResponse.add(questionSectionDto);
 
-
-        QuestionSectionDto section = new QuestionSectionDto();
-        section.setName("Section1");
-        section.setQuestions(questionDtos);
-        questionResponse.add(section);
 
         return questionResponse;
     }
