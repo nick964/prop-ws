@@ -7,10 +7,14 @@ import com.nick.propws.dto.SignUpRequest;
 import com.nick.propws.entity.ERole;
 import com.nick.propws.entity.Role;
 import com.nick.propws.entity.User;
+import com.nick.propws.repository.GroupRepository;
 import com.nick.propws.repository.RoleRepository;
 import com.nick.propws.repository.UserRepository;
+import com.nick.propws.service.GroupService;
 import com.nick.propws.service.UserDetailsImpl;
 import com.nick.propws.util.JwtUtil;
+import io.micrometer.common.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +36,8 @@ public class AuthController {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+
+    private GroupService groupService;
     private AuthenticationManager authenticationManager;
     private JwtUtil jwtUtil;
 
@@ -39,11 +45,13 @@ public class AuthController {
                           PasswordEncoder passwordEncoder,
                           RoleRepository roleRepository,
                           AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          GroupService groupService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.groupService = groupService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -85,6 +93,16 @@ public class AuthController {
         user.setPassword(hashedPassword);
         user.setRoles(roles);
         userRepository.save(user);
+        if(!StringUtils.isEmpty(signUpRequest.getGroupId()))
+        {
+            try {
+                this.groupService.addUserToGroup(user, signUpRequest.getGroupId());
+            } catch (Exception e) {
+                System.out.println("Error adding user to group");
+                return ResponseEntity.ok("Error adding group");
+            }
+
+        }
         return ResponseEntity.ok("User registered success");
     }
 

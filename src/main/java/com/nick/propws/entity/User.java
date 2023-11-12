@@ -2,12 +2,17 @@ package com.nick.propws.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Entity(name = "users")
 public class User {
+
+    public User() {
+        this.members = new ArrayList<Member>();
+    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

@@ -29,4 +29,9 @@ public class GroupController {
         String userName = loggedInUser.getUsername();
         return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
     }
+
+    @PostMapping("/details")
+    public @ResponseBody ResponseEntity<CreateGroupResponse> getDetails(@RequestParam Long groupId) {
+        return null;
+    }
 }

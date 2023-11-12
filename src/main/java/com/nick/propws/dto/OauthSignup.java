@@ -9,4 +9,6 @@ public class OauthSignup {
     private String img;
     private String provider;
     private String accessToken;
+
+    private String groupId;
 }
