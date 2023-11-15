@@ -29,8 +29,6 @@ public class MemberController {
             System.out.println("do something here ");
         }
         memberService.submitAnswers(submission, user);
-
-
     }
 
 

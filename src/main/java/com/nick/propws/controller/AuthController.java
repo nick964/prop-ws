@@ -92,6 +92,7 @@ public class AuthController {
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(hashedPassword);
         user.setRoles(roles);
+        user.setProvider("credentials");
         userRepository.save(user);
         if(!StringUtils.isEmpty(signUpRequest.getGroupId()))
         {
@@ -109,7 +110,7 @@ public class AuthController {
     @PostMapping("/oauth-register")
     public ResponseEntity<?> oauthSignup(@RequestBody OauthSignup signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username is already taken");
+           User user = userRepository.findUserByUsername(signUpRequest.getUsername());
         }
         Set<Role> roles = new HashSet<>();
         Optional<Role> userRole = roleRepository.findByName(ERole.ROLE_USER);
@@ -120,6 +121,8 @@ public class AuthController {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
+        user.setProvider(signUpRequest.getProvider());
+        user.setIcon(signUpRequest.getImg());
         user.setRoles(roles);
         String nonHashedPass = UUID.randomUUID().toString();
         String userPass = passwordEncoder.encode(nonHashedPass);

@@ -20,6 +20,8 @@ public class User {
 
     private String username;
 
+    private String name;
+
     private String email;
 
     private int role;
@@ -27,6 +29,11 @@ public class User {
     private String created_at;
 
     private String password;
+
+    private String provider;
+
+    private String icon;
+
 
     @OneToMany(mappedBy = "user")
     private List<Member> members;
@@ -99,5 +106,29 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }

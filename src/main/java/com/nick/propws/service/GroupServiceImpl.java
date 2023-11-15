@@ -42,10 +42,10 @@ public class GroupServiceImpl implements GroupService{
     @Override
     public Group createGroup(CreateGroupReq req) {
         Group g = new Group();
-        g.setName(req.getName());
-        g.setIcon(req.getIcon());
-        g.setRole(1);
-        g.setKey(UUID.randomUUID().toString());
+//        g.setName(req.getName());
+//        g.setIcon(req.getIcon());
+//        g.setRole(1);
+//        g.setKey(UUID.randomUUID().toString());
         return groupRepository.save(g);
     }
 
@@ -57,7 +57,7 @@ public class GroupServiceImpl implements GroupService{
 
         g.setName(createGroupReq.getName());
         g.setIcon(createGroupReq.getIcon());
-        g.setKey(UUID.randomUUID().toString());
+        g.setGroupKey(UUID.randomUUID().toString());
 
         Group saved = groupRepository.save(g);
 
@@ -68,7 +68,7 @@ public class GroupServiceImpl implements GroupService{
 
         CreateGroupResponse res = new CreateGroupResponse();
         res.setId(saved.getId());
-        res.setKey(g.getKey());
+        res.setKey(g.getGroupKey());
         res.setName(g.getName());
         res.setDescription(createGroupReq.getDescription());
 

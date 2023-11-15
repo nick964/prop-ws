@@ -7,6 +7,7 @@ public class OauthSignup {
     private String username;
     private String email;
     private String img;
+    private String name;
     private String provider;
     private String accessToken;
 

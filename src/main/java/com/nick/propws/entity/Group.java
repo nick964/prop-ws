@@ -5,19 +5,19 @@ import lombok.Data;
 
 import java.util.List;
 
-@Entity(name = "mygroups")
+@Entity(name = "MYGROUPS")
 @Data
 public class Group {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
     private String name;
 
-    private String key;
+    private String groupKey;
 
-    private int role;
+    private int groupRole;
 
     private String icon;
 

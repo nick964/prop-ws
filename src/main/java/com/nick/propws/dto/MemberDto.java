@@ -8,6 +8,12 @@ public class MemberDto {
     public Long questionId;
 
     public String answer;
+
+    private Long submission_status;
+
+    private Long score;
+
+    private GroupDto groupDto;
     
 
 }

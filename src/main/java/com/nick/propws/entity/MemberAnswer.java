@@ -24,9 +24,8 @@ public class MemberAnswer {
 
     private String answer;
 
-    @Column(columnDefinition = "integer default 0")
-
-    private Integer score;
+    @Column
+    private Long score;
 
 
 
