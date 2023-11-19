@@ -5,6 +5,7 @@ import com.nick.propws.dto.CreateGroupResponse;
 import com.nick.propws.dto.GroupDetailsResponse;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.User;
+import com.nick.propws.exceptions.PropSheetException;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -17,9 +18,9 @@ public interface GroupService {
 
     CreateGroupResponse createGroup(CreateGroupReq createGroupReq, String email);
 
-    void addUserToGroup(User user, String groupId) throws Exception;
+    void addUserToGroup(User user, String groupId) throws PropSheetException;
 
-    ResponseEntity<?> getGroupDetail(Long groupId) throws Exception;
+    ResponseEntity<?> getGroupDetail(Long groupId) throws PropSheetException;
 
 
 }

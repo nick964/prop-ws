@@ -9,7 +9,7 @@ public class MemberSubmissionDto {
 
     public int groupId;
 
-    public List<MemberAnswerDto> answers;
+    public List<AnswerDto> answers;
 
 
 }

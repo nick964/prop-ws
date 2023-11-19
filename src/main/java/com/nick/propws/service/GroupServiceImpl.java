@@ -6,6 +6,7 @@ import com.nick.propws.dto.GroupDetailsResponse;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
+import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.GroupRepository;
 import com.nick.propws.repository.MemberRepository;
 import com.nick.propws.repository.UserRepository;
@@ -77,11 +78,11 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
-    public void addUserToGroup(User user, String groupId) throws Exception {
+    public void addUserToGroup(User user, String groupId){
         Long gId = Long.valueOf(groupId);
         Optional<Group> g = groupRepository.findById(gId);
         if(g.isEmpty()) {
-            throw new Exception("Group not found");
+            throw new PropSheetException("Group not found");
         }
         Group myGroup = g.get();
         Member newMember = new Member();
@@ -94,11 +95,11 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
-    public ResponseEntity<?> getGroupDetail(Long groupId) throws Exception {
+    public ResponseEntity<?> getGroupDetail(Long groupId) throws PropSheetException {
 
         Optional<Group> findGroup = this.groupRepository.findById(groupId);
         if(findGroup.isEmpty()) {
-            throw new Exception("No gropu found");
+            throw new PropSheetException("No group found with id " + groupId);
         }
         return ResponseEntity.ok(mapResponse(findGroup.get()));
     }

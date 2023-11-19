@@ -15,6 +15,7 @@ import com.nick.propws.service.UserDetailsImpl;
 import com.nick.propws.util.JwtUtil;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,9 @@ public class AuthController {
     private GroupService groupService;
     private AuthenticationManager authenticationManager;
     private JwtUtil jwtUtil;
+
+    @Value("${propsheet.oauth.pw}")
+    private String oauthPw;
 
     public AuthController(UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
@@ -109,29 +113,33 @@ public class AuthController {
 
     @PostMapping("/oauth-register")
     public ResponseEntity<?> oauthSignup(@RequestBody OauthSignup signUpRequest) {
+        Authentication authentication;
+        String jwt;
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-           User user = userRepository.findUserByUsername(signUpRequest.getUsername());
+            User user = userRepository.findUserByUsername(signUpRequest.getUsername());
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), oauthPw));
+        } else {
+            Set<Role> roles = new HashSet<>();
+            Optional<Role> userRole = roleRepository.findByName(ERole.ROLE_USER);
+            if (userRole.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("role not found");
+            }
+            roles.add(userRole.get());
+            User user = new User();
+            user.setUsername(signUpRequest.getUsername());
+            user.setEmail(signUpRequest.getEmail());
+            user.setProvider(signUpRequest.getProvider());
+            user.setIcon(signUpRequest.getImg());
+            user.setRoles(roles);
+            String nonHashedPass = oauthPw;
+            String userPass = passwordEncoder.encode(nonHashedPass);
+            user.setPassword(userPass);
+            userRepository.save(user);
+            User saveduser = userRepository.save(user);
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(saveduser.getUsername(), nonHashedPass));
         }
-        Set<Role> roles = new HashSet<>();
-        Optional<Role> userRole = roleRepository.findByName(ERole.ROLE_USER);
-        if (userRole.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("role not found");
-        }
-        roles.add(userRole.get());
-        User user = new User();
-        user.setUsername(signUpRequest.getUsername());
-        user.setEmail(signUpRequest.getEmail());
-        user.setProvider(signUpRequest.getProvider());
-        user.setIcon(signUpRequest.getImg());
-        user.setRoles(roles);
-        String nonHashedPass = UUID.randomUUID().toString();
-        String userPass = passwordEncoder.encode(nonHashedPass);
-        user.setPassword(userPass);
-        userRepository.save(user);
-        User saveduser = userRepository.save(user);
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(saveduser.getUsername(), nonHashedPass));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtil.generateJwtToken(authentication);
+        jwt = jwtUtil.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> rolesReturn = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())

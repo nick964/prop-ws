@@ -3,7 +3,7 @@ package com.nick.propws.dto;
 import lombok.Data;
 
 @Data
-public class MemberAnswerDto {
+public class AnswerDto {
 
     public Long questionId;
 

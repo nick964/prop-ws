@@ -1,6 +1,6 @@
 package com.nick.propws.service;
 
-import com.nick.propws.dto.MemberAnswerDto;
+import com.nick.propws.dto.AnswerDto;
 import com.nick.propws.dto.MemberSubmissionDto;
 import com.nick.propws.entity.*;
 import com.nick.propws.repository.MemberAnswerRepository;
@@ -51,7 +51,7 @@ public class MemberServiceImpl implements  MemberService{
 
     private List<MemberAnswer> mapToMemberAnswers(MemberSubmissionDto memberSubmission, Member member) {
         List<MemberAnswer> memberAnswers = new ArrayList<>();
-        for(MemberAnswerDto answer : memberSubmission.getAnswers()) {
+        for(AnswerDto answer : memberSubmission.getAnswers()) {
             Question q = questionRepository.getReferenceById(answer.getQuestionId());
             MemberAnswer ans = new MemberAnswer();
             ans.setAnswer(answer.getAnswer());
