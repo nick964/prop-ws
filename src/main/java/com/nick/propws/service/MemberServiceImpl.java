@@ -40,7 +40,11 @@ public class MemberServiceImpl implements  MemberService{
             System.out.println("throw error here, list shouldn't be empty");
         }
         Member member = members.get(0);
+        List<MemberAnswer> existingSubmissions = memberAnswerRepository.findMemberAnswersByMember(member);
         List<MemberAnswer> memberAnswers = mapToMemberAnswers(memberSubmission, member);
+        if(!existingSubmissions.isEmpty()) {
+            memberAnswers = updateExistingSubmissions(existingSubmissions, memberAnswers);
+        }
         memberAnswerRepository.saveAll(memberAnswers);
         member.setAnswers(memberAnswers);
         member.setSubmission_status(1L);
@@ -61,4 +65,17 @@ public class MemberServiceImpl implements  MemberService{
         }
         return memberAnswers;
     }
+
+    private List<MemberAnswer> updateExistingSubmissions(List<MemberAnswer> existingSubmissions, List<MemberAnswer> memberAnswers) {
+        for(MemberAnswer existingSubmission : existingSubmissions) {
+            for(MemberAnswer memberAnswer : memberAnswers) {
+                if(existingSubmission.getQuestion().getId().intValue() == memberAnswer.getQuestion().getId().intValue()) {
+                    existingSubmission.setAnswer(memberAnswer.getAnswer());
+                }
+            }
+        }
+        return existingSubmissions;
+    }
+
+
 }
