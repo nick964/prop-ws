@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService{
     private MemberDto mapFromGroup(Member m, GroupDto groupDto) {
         MemberDto mDto = new MemberDto();
         mDto.setScore(m.getScore());
-        mDto.setSubmission_status(m.getSubmission_status());
+        mDto.setSubmission_status(m.getSubmission_status() == null ? 0L : 1L);
         mDto.setGroupDto(groupDto);
         return mDto;
     }

@@ -54,4 +54,12 @@ public class MasterAnswer {
     public void setUpdated_at(String updated_at) {
         this.updated_at = updated_at;
     }
+
+    public Question getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(Question question) {
+        this.question = question;
+    }
 }

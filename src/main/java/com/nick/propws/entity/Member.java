@@ -25,6 +25,8 @@ public class Member {
 
     private Long score;
 
+    private boolean isGroupAdmin;
+
     @OneToMany(mappedBy = "member")
     private List<MemberAnswer> answers;
 
@@ -75,5 +77,13 @@ public class Member {
 
     public void setAnswers(List<MemberAnswer> answers) {
         this.answers = answers;
+    }
+
+    public boolean isGroupAdmin() {
+        return isGroupAdmin;
+    }
+
+    public void setGroupAdmin(boolean groupAdmin) {
+        isGroupAdmin = groupAdmin;
     }
 }

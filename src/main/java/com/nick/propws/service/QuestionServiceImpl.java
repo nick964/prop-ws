@@ -59,6 +59,7 @@ public class QuestionServiceImpl  implements QuestionService{
         qDto.setId(q.getId());
         qDto.setText(q.getText());
         qDto.setQuestionType("radio");
+        qDto.setLineValue(q.getLine_value());
         if(!q.getOptions().isEmpty()) {
             QuestionOptions opt = q.getOptions().get(0);
             String[] options = opt.getOption().split(",");

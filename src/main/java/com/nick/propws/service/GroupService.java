@@ -22,5 +22,7 @@ public interface GroupService {
 
     ResponseEntity<?> getGroupDetail(Long groupId) throws PropSheetException;
 
+    int getMemberPositionInGroup(Long memberId, Group g) throws PropSheetException;
+
 
 }

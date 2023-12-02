@@ -2,7 +2,10 @@ package com.nick.propws.service;
 
 import com.nick.propws.dto.AnswerDto;
 import com.nick.propws.dto.MemberSubmissionDto;
+import com.nick.propws.dto.SubmissionResponse;
+import com.nick.propws.dto.TrackResponse;
 import com.nick.propws.entity.*;
+import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.MemberAnswerRepository;
 import com.nick.propws.repository.MemberRepository;
 import com.nick.propws.repository.QuestionRepository;
@@ -22,6 +25,10 @@ public class MemberServiceImpl implements  MemberService{
 
     @Autowired
     MemberAnswerRepository memberAnswerRepository;
+
+    @Autowired
+    GroupService groupService;
+
     @Override
     public Member createMember(User user, Group group) {
         Member m = new Member();
@@ -31,15 +38,18 @@ public class MemberServiceImpl implements  MemberService{
     }
 
     @Override
-    public void submitAnswers(MemberSubmissionDto memberSubmission, User user) {
+    public void submitAnswers(MemberSubmissionDto memberSubmission, User user) throws PropSheetException {
         List<Member> members = user.getMembers()
                 .stream()
                 .filter(member -> member.getGroup().getId().intValue() == memberSubmission.getGroupId())
                 .toList();
         if(members.isEmpty()) {
-            System.out.println("throw error here, list shouldn't be empty");
+            throw new PropSheetException("No members associated with user");
         }
         Member member = members.get(0);
+        if(member.getSubmission_status() == 1) {
+            throw new PropSheetException("This member has already submitted an entry for this group");
+        }
         List<MemberAnswer> existingSubmissions = memberAnswerRepository.findMemberAnswersByMember(member);
         List<MemberAnswer> memberAnswers = mapToMemberAnswers(memberSubmission, member);
         if(!existingSubmissions.isEmpty()) {
@@ -47,9 +57,46 @@ public class MemberServiceImpl implements  MemberService{
         }
         memberAnswerRepository.saveAll(memberAnswers);
         member.setAnswers(memberAnswers);
-        member.setSubmission_status(1L);
+        member.setSubmission_status((long) memberSubmission.getFinalSubmit());
         memberRepository.save(member);
         System.out.println("Finish submission process");
+    }
+
+    @Override
+    public SubmissionResponse trackResponse(User user, Long groupId) throws PropSheetException {
+        List<Member> members = user.getMembers()
+                .stream()
+                .filter(member -> member.getGroup().getId().intValue() == groupId)
+                .toList();
+        if(members.isEmpty()) {
+            throw new PropSheetException("No members associated with user");
+        }
+        List<TrackResponse> res = new ArrayList<>();
+        Member member = members.get(0);
+        List<MemberAnswer> existingSubmissions = memberAnswerRepository.findMemberAnswersByMember(member);
+        for(MemberAnswer ans : existingSubmissions) {
+            TrackResponse trackResponse = getTrackResponse(ans);
+            res.add(trackResponse);
+        }
+        int position = groupService.getMemberPositionInGroup(member.getId(), member.getGroup());
+        SubmissionResponse response = new SubmissionResponse();
+        response.setResponses(res);
+        response.setPosition(position);
+        return  response;
+    }
+
+    private static TrackResponse getTrackResponse(MemberAnswer ans) {
+        TrackResponse trackResponse = new TrackResponse();
+        trackResponse.setQuestionText(ans.getQuestion().getText());
+        trackResponse.setSection(ans.getQuestion().getSection());
+        trackResponse.setCorrect(ans.getScore() != null && ans.getScore() == 1);
+        trackResponse.setAnswer(ans.getAnswer());
+        if(ans.getQuestion().getMasterAnswer() != null) {
+            trackResponse.setCorrectAnswer(ans.getQuestion().getMasterAnswer().getAnswer());
+        } else {
+            trackResponse.setCorrectAnswer("");
+        }
+        return trackResponse;
     }
 
 

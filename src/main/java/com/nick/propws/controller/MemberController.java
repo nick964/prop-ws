@@ -1,6 +1,8 @@
 package com.nick.propws.controller;
 
 import com.nick.propws.dto.MemberSubmissionDto;
+import com.nick.propws.dto.SubmissionResponse;
+import com.nick.propws.dto.TrackResponse;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
 import com.nick.propws.service.MemberService;
@@ -29,6 +31,15 @@ public class MemberController {
             System.out.println("do something here ");
         }
         memberService.submitAnswers(submission, user);
+    }
+
+    @GetMapping("/track")
+    public @ResponseBody SubmissionResponse trackAnswers(@RequestParam Long groupId) {
+        User user = userUtil.getUserFromAuth();
+        if(user == null) {
+            System.out.println("do something here ");
+        }
+        return memberService.trackResponse(user, groupId);
     }
 
 

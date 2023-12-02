@@ -13,8 +13,8 @@ insert into roles (name) values ('ROLE_ADMIN');
  INSERT INTO question_option (id, option, input_type) VALUES (1, 'O,U', 'radio');
  INSERT INTO question_option (id, option, input_type) VALUES (2, 'Y,N', 'radio');
 
- INSERT INTO questions (id, text, section, question_type, line_value) VALUES (1, '1st Quarter', 'Game Points', 1, 9.5);
- INSERT INTO questions (id, text, section, question_type, line_value) VALUES (2, '2nd Quarter', 'Game Points', 1, 13.5);
+INSERT INTO questions (id, text, section, question_type, line_value) VALUES (1, '1st Quarter', 'Game Points', 1, 9.5);
+INSERT INTO questions (id, text, section, question_type, line_value) VALUES (2, '2nd Quarter', 'Game Points', 1, 13.5);
 INSERT INTO questions (id, text, section, question_type, line_value) VALUES (3, '3rd Quarter', 'Game Points', 1, 13.5);
 INSERT INTO questions (id, text, section, question_type, line_value) VALUES (4, '4th Quarter', 'Game Points', 1, 13.5);
 INSERT INTO questions (id, text, section, question_type, line_value) VALUES (5, 'Heads or Tails', 'National Anthem', 1, 13.5);

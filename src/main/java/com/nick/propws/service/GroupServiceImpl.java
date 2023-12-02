@@ -12,9 +12,16 @@ import com.nick.propws.repository.MemberRepository;
 import com.nick.propws.repository.UserRepository;
 import com.nick.propws.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -31,6 +38,9 @@ public class GroupServiceImpl implements GroupService{
 
     @Autowired
     UserUtil userUtil;
+
+    @Value("${upload.dir}")
+    private String uploadDir;
 
 
     @Override
@@ -65,6 +75,7 @@ public class GroupServiceImpl implements GroupService{
         Member m = new Member();
         m.setGroup(saved);
         m.setUser(user);
+        m.setGroupAdmin(true);
         memberRepository.save(m);
 
         CreateGroupResponse res = new CreateGroupResponse();
@@ -118,5 +129,44 @@ public class GroupServiceImpl implements GroupService{
             return null;
         }
         return Collections.max(members, Comparator.comparing(Member::getScore));
+    }
+
+    @Override
+    public int getMemberPositionInGroup(Long memberId, Group g) throws PropSheetException {
+        List<Member> members = g.getMembers();
+        if(members.isEmpty()) {
+            throw new PropSheetException("No members in group");
+        }
+        List<Long> scores = new ArrayList<>();
+        for(Member m : members) {
+            scores.add(m.getScore());
+        }
+        Collections.sort(scores);
+        Collections.reverse(scores);
+        int position = scores.indexOf(memberId);
+        return position + 1;
+    }
+
+
+    private String saveImage(MultipartFile image) {
+        try {
+            // Generate a unique filename
+            String fileName = StringUtils.cleanPath(UUID.randomUUID().toString() + "_" + image.getOriginalFilename());
+
+            // Resolve the upload directory
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+            // Ensure the directory exists, create if not
+            Files.createDirectories(uploadPath);
+
+            // Save the file to the server
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(image.getInputStream(), filePath);
+
+            // Build and return the URL
+            return "/uploads/" + fileName; // Adjust the URL structure as needed
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to save image", ex);
+        }
     }
 }
