@@ -47,7 +47,7 @@ public class MemberServiceImpl implements  MemberService{
             throw new PropSheetException("No members associated with user");
         }
         Member member = members.get(0);
-        if(member.getSubmission_status() == 1) {
+        if(member.getSubmission_status() != null && member.getSubmission_status() == 1) {
             throw new PropSheetException("This member has already submitted an entry for this group");
         }
         List<MemberAnswer> existingSubmissions = memberAnswerRepository.findMemberAnswersByMember(member);
@@ -79,9 +79,16 @@ public class MemberServiceImpl implements  MemberService{
             res.add(trackResponse);
         }
         int position = groupService.getMemberPositionInGroup(member.getId(), member.getGroup());
+        int score = 0;
+        for(TrackResponse trackResponse : res) {
+            if(trackResponse.isCorrect()) {
+                score++;
+            }
+        }
         SubmissionResponse response = new SubmissionResponse();
         response.setResponses(res);
         response.setPosition(position);
+        response.setTotalScore(score);
         return  response;
     }
 

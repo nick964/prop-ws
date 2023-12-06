@@ -67,6 +67,9 @@ public class QuestionServiceImpl  implements QuestionService{
                 qDto.getOptions().add(option);
             }
         }
+        if(!(q.getMasterAnswer() == null)) {
+            qDto.setAnswer(q.getMasterAnswer().getAnswer());
+        }
         return qDto;
     }
 }

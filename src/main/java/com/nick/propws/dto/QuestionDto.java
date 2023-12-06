@@ -21,4 +21,6 @@ public class QuestionDto {
 
     private List<String> options;
 
+    private String answer;
+
 }
