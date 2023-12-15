@@ -49,7 +49,6 @@ INSERT INTO question_option_relation (id, question_id, question_option_id) VALUE
 INSERT INTO question_option_relation (id, question_id, question_option_id) VALUES (15, 15, 2);
 INSERT INTO question_option_relation (id, question_id, question_option_id) VALUES (16, 16, 2);
 
-
-
+INSERT INTO configsetup (id, rule, enabled) values (1, 'game_started', false)
 --
  --INSERT INTO master_answers (id, question_id, answer) VALUES (1, 1, 'N')

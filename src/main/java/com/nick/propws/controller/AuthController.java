@@ -77,7 +77,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<?> signup(@RequestBody SignUpRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username is already taken");
         }
@@ -92,12 +92,12 @@ public class AuthController {
         }
         roles.add(userRole.get());
         User user = new User();
-        user.setUsername(signUpRequest.getUsername());
+        user.setUsername(signUpRequest.getEmail());
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(hashedPassword);
         user.setRoles(roles);
         user.setProvider("credentials");
-        userRepository.save(user);
+        User us = userRepository.save(user);
         if(!StringUtils.isEmpty(signUpRequest.getGroupId()))
         {
             try {
@@ -108,7 +108,8 @@ public class AuthController {
             }
 
         }
-        return ResponseEntity.ok("User registered success");
+        JwtResponse res = new JwtResponse();
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/oauth-register")
