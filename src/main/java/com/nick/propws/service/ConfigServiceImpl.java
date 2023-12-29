@@ -1,5 +1,6 @@
 package com.nick.propws.service;
 
+import com.nick.propws.dto.ConfigDto;
 import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.dto.CreateGroupResponse;
 import com.nick.propws.dto.GroupDetailsResponse;
@@ -33,11 +34,35 @@ public class ConfigServiceImpl implements ConfigService{
     ConfigServiceRepository configServiceRepository;
 
     @Override
-    public void setConfig(String config, boolean result) {
-        ConfigSetup foundConfig = configServiceRepository.findConfigSetupByRule(config);
+    public void setConfig(ConfigDto configDto) {
+        ConfigSetup foundConfig = configServiceRepository.findConfigSetupByRule(configDto.getRule());
         if(foundConfig != null) {
-            foundConfig.setEnabled(result);
+            foundConfig.setEnabled(configDto.isEnabled());
             configServiceRepository.save(foundConfig);
+        } else {
+            ConfigSetup setup = new ConfigSetup();
+            setup.setEnabled(configDto.isEnabled());
+            setup.setRule(configDto.getRule());
+            setup.setDescription(configDto.getDescription());
+            configServiceRepository.save(setup);
         }
+    }
+
+    @Override
+    public List<ConfigDto> getAllConfigRules() {
+        List<ConfigSetup> configs = this.configServiceRepository.findAll();
+        List<ConfigDto> configDtos = new ArrayList<>();
+        for(ConfigSetup configSetup : configs) {
+            configDtos.add(mapFromConfigEntity(configSetup));
+        }
+        return configDtos;
+    }
+
+    private ConfigDto mapFromConfigEntity(ConfigSetup c) {
+        ConfigDto qDto = new ConfigDto();
+        qDto.setRule(c.getRule());
+        qDto.setEnabled(c.isEnabled());
+        qDto.setDescription(c.getDescription());
+        return qDto;
     }
 }

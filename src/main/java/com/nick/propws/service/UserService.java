@@ -1,6 +1,7 @@
 package com.nick.propws.service;
 
 import com.nick.propws.dto.ProfileResponse;
+import com.nick.propws.dto.UserDto;
 import com.nick.propws.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,5 +21,7 @@ public interface UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
     ProfileResponse getProfile() throws UsernameNotFoundException;
+
+    List<UserDto> searchUsers(String key);
 
 }

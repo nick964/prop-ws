@@ -2,6 +2,7 @@ package com.nick.propws.controller;
 
 import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.dto.ProfileResponse;
+import com.nick.propws.dto.UserDto;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.User;
 import com.nick.propws.service.GroupService;
@@ -36,6 +37,11 @@ public class UserController {
     @GetMapping("/profile")
     public @ResponseBody ProfileResponse getProfile() {
         return userService.getProfile();
+    }
+
+    @GetMapping("/search")
+    public @ResponseBody List<UserDto> searchUsers(@RequestParam String searchKey) {
+        return userService.searchUsers(searchKey);
     }
 
 

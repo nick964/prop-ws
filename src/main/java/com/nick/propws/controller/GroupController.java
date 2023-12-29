@@ -56,9 +56,9 @@ public class GroupController {
     @PostMapping("/share")
     public @ResponseBody ResponseEntity<String> shareInvite(@RequestBody ShareGroupRequest shareReq) {
         if(shareReq.getInviteType().equals("text")) {
-            return twilioService.sendText(shareReq.getRecipient(), shareReq.getGroupId());
+            return twilioService.sendText(shareReq);
         } else if (shareReq.getInviteType().equals("email")) {
-            return twilioService.sendEmail(shareReq.getRecipient(), shareReq.getGroupId());
+            return twilioService.sendEmail(shareReq);
         } else {
             return new ResponseEntity<>("Invite type is not supported", HttpStatus.BAD_REQUEST);
         }

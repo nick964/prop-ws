@@ -11,7 +11,7 @@ public class QuestionOptions {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    private String option;
+    private String question_option;
 
     private String input_type;
 
@@ -24,11 +24,11 @@ public class QuestionOptions {
     }
 
     public String getOption() {
-        return option;
+        return question_option;
     }
 
     public void setOption(String option) {
-        this.option = option;
+        this.question_option = option;
     }
 
     public String getInput_type() {

@@ -15,6 +15,8 @@ public class ConfigSetup {
 
     private String rule;
 
+    private String description;
+
     private boolean enabled;
 
 

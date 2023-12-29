@@ -1,9 +1,12 @@
 package com.nick.propws.service;
 
+import com.nick.propws.dto.ConfigDto;
 import com.nick.propws.dto.QuestionDto;
 import com.nick.propws.dto.QuestionSectionDto;
+import com.nick.propws.entity.ConfigSetup;
 import com.nick.propws.entity.Question;
 import com.nick.propws.entity.QuestionOptions;
+import com.nick.propws.repository.ConfigServiceRepository;
 import com.nick.propws.repository.QuestionRepository;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ public class QuestionServiceImpl  implements QuestionService{
     public List<QuestionSectionDto> getAllQuestions() {
 
         List<Question> allQuestions = questionRepository.findAll();
+
 
         List<QuestionSectionDto> questionResponse = new ArrayList<>();
         List<QuestionDto> questionDtos = new ArrayList<>();
@@ -70,6 +74,13 @@ public class QuestionServiceImpl  implements QuestionService{
         if(!(q.getMasterAnswer() == null)) {
             qDto.setAnswer(q.getMasterAnswer().getAnswer());
         }
+        return qDto;
+    }
+
+    private ConfigDto mapFromConfigEntity(ConfigSetup c) {
+        ConfigDto qDto = new ConfigDto();
+        qDto.setRule(c.getRule());
+        qDto.setEnabled(c.isEnabled());
         return qDto;
     }
 }

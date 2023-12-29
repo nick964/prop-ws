@@ -10,12 +10,15 @@ public class QuestionSectionDto {
 
     public QuestionSectionDto() {
         this.questions = new ArrayList<>();
+        this.configRules = new ArrayList<>();
     }
 
 
     private Long id;
     private String name;
     private List<QuestionDto> questions;
+    private List<ConfigDto> configRules;
+
 
 
 }

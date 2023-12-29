@@ -10,8 +10,8 @@ insert into roles (name) values ('ROLE_ADMIN');
 --
 -- INSERT INTO members (group_id, user_id) VALUES (1, 1)
 --
- INSERT INTO question_option (id, option, input_type) VALUES (1, 'O,U', 'radio');
- INSERT INTO question_option (id, option, input_type) VALUES (2, 'Y,N', 'radio');
+ INSERT INTO question_option (id, question_option, input_type) VALUES (1, 'O,U', 'radio');
+ INSERT INTO question_option (id, question_option, input_type) VALUES (2, 'Y,N', 'radio');
 
 INSERT INTO questions (id, text, section, question_type, line_value) VALUES (1, '1st Quarter', 'Game Points', 1, 9.5);
 INSERT INTO questions (id, text, section, question_type, line_value) VALUES (2, '2nd Quarter', 'Game Points', 1, 13.5);

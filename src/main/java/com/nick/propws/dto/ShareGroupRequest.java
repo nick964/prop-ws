@@ -7,6 +7,7 @@ public class ShareGroupRequest {
 
     private String groupId;
 
+    private String name;
     private String inviteType;
 
     private String recipient;
