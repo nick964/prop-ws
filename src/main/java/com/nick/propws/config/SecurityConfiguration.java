@@ -59,6 +59,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(antMatcher((HttpMethod.OPTIONS),"/**")).permitAll() // Allow those pesky preflight requests
                         .requestMatchers(antMatcher("/api/auth/**")).permitAll()
+                        .requestMatchers(antMatcher("/actuator/**")).permitAll()
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
                         .anyRequest().authenticated() )
                 .sessionManagement(
