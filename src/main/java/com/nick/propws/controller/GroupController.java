@@ -55,7 +55,7 @@ public class GroupController {
 
     @PostMapping("/share")
     public @ResponseBody ResponseEntity<String> shareInvite(@RequestBody ShareGroupRequest shareReq) {
-        if(shareReq.getInviteType().equals("text")) {
+        if(shareReq.getInviteType().equals("sms")) {
             return twilioService.sendText(shareReq);
         } else if (shareReq.getInviteType().equals("email")) {
             return twilioService.sendEmail(shareReq);

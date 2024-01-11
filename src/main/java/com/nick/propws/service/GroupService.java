@@ -12,10 +12,6 @@ import java.util.List;
 
 public interface GroupService {
 
-    List<Group> getGroups();
-
-    Group createGroup(CreateGroupReq createGroupReq);
-
     CreateGroupResponse createGroup(CreateGroupReq createGroupReq, String email);
 
     void addUserToGroup(User user, String groupId) throws PropSheetException;

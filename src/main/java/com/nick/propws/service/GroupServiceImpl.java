@@ -44,23 +44,6 @@ public class GroupServiceImpl implements GroupService{
 
 
     @Override
-    public List<Group> getGroups() {
-        User currentUser = userUtil.getUserFromAuth();
-        return null;
-
-    }
-
-    @Override
-    public Group createGroup(CreateGroupReq req) {
-        Group g = new Group();
-//        g.setName(req.getName());
-//        g.setIcon(req.getIcon());
-//        g.setRole(1);
-//        g.setKey(UUID.randomUUID().toString());
-        return groupRepository.save(g);
-    }
-
-    @Override
     public CreateGroupResponse createGroup(CreateGroupReq createGroupReq, String username) {
 
         User user = userRepository.findUserByUsername(username);
@@ -139,7 +122,11 @@ public class GroupServiceImpl implements GroupService{
         }
         List<Long> scores = new ArrayList<>();
         for(Member m : members) {
-            scores.add(m.getScore());
+            Long score = m.getScore();
+            if(score == null) {
+                score = 0L;
+            }
+            scores.add(score);
         }
         Collections.sort(scores);
         Collections.reverse(scores);
