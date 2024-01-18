@@ -118,6 +118,12 @@ public class AuthController {
         String jwt;
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             User user = userRepository.findUserByUsername(signUpRequest.getUsername());
+            if(!user.getProvider().equals(signUpRequest.getProvider())) {
+                JwtResponse response = new JwtResponse();
+                response.setSuccess(false);
+                response.setErrorMessage("Error - A user already exists with this username. Did you login with "+ user.getProvider() + "?");
+                return ResponseEntity.ok(response);
+            }
             authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), oauthPw));
         } else {
             Set<Role> roles = new HashSet<>();

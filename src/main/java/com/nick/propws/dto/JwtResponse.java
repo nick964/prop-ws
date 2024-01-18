@@ -10,6 +10,8 @@ import java.util.List;
 public class JwtResponse {
     private String token;
     private String type = "Bearer";
+    private boolean success = true;
+    private String errorMessage;
     private Long id;
     private String username;
     private List<String> roles;

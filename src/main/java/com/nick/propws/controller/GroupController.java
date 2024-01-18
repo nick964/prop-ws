@@ -3,13 +3,10 @@ package com.nick.propws.controller;
 import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.dto.CreateGroupResponse;
 import com.nick.propws.dto.ShareGroupRequest;
-import com.nick.propws.entity.Group;
-import com.nick.propws.entity.Question;
 import com.nick.propws.entity.User;
 import com.nick.propws.service.GroupService;
-import com.nick.propws.service.TwilioService;
+import com.nick.propws.service.NotificationService;
 import com.nick.propws.service.UserDetailsImpl;
-import com.nick.propws.service.UserService;
 import com.nick.propws.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController()
 @RequestMapping("groups")
@@ -31,7 +26,7 @@ public class GroupController {
     UserUtil userUtil;
 
     @Autowired
-    TwilioService twilioService;
+    NotificationService twilioService;
 
     @PostMapping("/create")
     public @ResponseBody ResponseEntity<CreateGroupResponse> createGroup(@RequestBody CreateGroupReq createGroupReq) {

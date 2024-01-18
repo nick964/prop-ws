@@ -7,6 +7,9 @@ import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.MasterAnswerRepository;
 import com.nick.propws.repository.MemberAnswerRepository;
 import com.nick.propws.repository.QuestionRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +31,9 @@ public class MasterAnswerServiceImpl implements MasterAnswerService{
 
     @Autowired
     MemberAnswerRepository memberAnswerRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public List<MasterAnswer> addMasterAnswer(List<AnswerDto> answers) throws PropSheetException {
@@ -63,5 +69,24 @@ public class MasterAnswerServiceImpl implements MasterAnswerService{
         }
         return answersToReturn;
 
+    }
+
+    @Override
+    @Transactional
+    public void updateAnswers() throws PropSheetException {
+        try {
+            String sql = "UPDATE member_answers ma " +
+                    "SET ma.score = CASE " +
+                    "    WHEN ma.answer = (SELECT m.answer FROM master_answers m WHERE m.question_id = ma.question_id) THEN 1 " +
+                    "    ELSE 0 " +
+                    "END " +
+                    "WHERE EXISTS (SELECT 1 FROM master_answers m WHERE m.question_id = ma.question_id)";
+
+            int updatedCount = entityManager.createNativeQuery(sql).executeUpdate();
+            log.info(updatedCount + " member answers updated successfully");
+        } catch (Exception e) {
+            log.error("Error updating member answers", e);
+            throw new PropSheetException("Error updating member answers: " + e.getMessage());
+        }
     }
 }

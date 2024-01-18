@@ -9,6 +9,7 @@ import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.MemberAnswerRepository;
 import com.nick.propws.repository.MemberRepository;
 import com.nick.propws.repository.QuestionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,9 @@ public class MemberServiceImpl implements  MemberService{
 
     @Autowired
     MemberAnswerRepository memberAnswerRepository;
+
+    @Autowired
+    MasterAnswerService masterAnswerService;
 
     @Autowired
     GroupService groupService;
@@ -63,7 +67,9 @@ public class MemberServiceImpl implements  MemberService{
     }
 
     @Override
+    @Transactional
     public SubmissionResponse trackResponse(User user, Long groupId) throws PropSheetException {
+        masterAnswerService.updateAnswers();
         List<Member> members = user.getMembers()
                 .stream()
                 .filter(member -> member.getGroup().getId().intValue() == groupId)

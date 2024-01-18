@@ -9,4 +9,6 @@ import java.util.List;
 public interface MasterAnswerService {
 
     List<MasterAnswer> addMasterAnswer(List<AnswerDto> answer) throws PropSheetException;
+
+    void updateAnswers() throws PropSheetException;
 }
