@@ -1,9 +1,6 @@
 package com.nick.propws.service;
 
-import com.nick.propws.dto.AnswerDto;
-import com.nick.propws.dto.MemberSubmissionDto;
-import com.nick.propws.dto.SubmissionResponse;
-import com.nick.propws.dto.TrackResponse;
+import com.nick.propws.dto.*;
 import com.nick.propws.entity.*;
 import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.MemberAnswerRepository;
@@ -50,6 +47,7 @@ public class MemberServiceImpl implements  MemberService{
         if(members.isEmpty()) {
             throw new PropSheetException("No members associated with user");
         }
+
         Member member = members.get(0);
         if(member.getSubmission_status() != null && member.getSubmission_status() == 1) {
             throw new PropSheetException("This member has already submitted an entry for this group");
@@ -79,6 +77,7 @@ public class MemberServiceImpl implements  MemberService{
         }
         List<TrackResponse> res = new ArrayList<>();
         Member member = members.get(0);
+
         List<MemberAnswer> existingSubmissions = memberAnswerRepository.findMemberAnswersByMember(member);
         for(MemberAnswer ans : existingSubmissions) {
             TrackResponse trackResponse = getTrackResponse(ans);
@@ -91,10 +90,12 @@ public class MemberServiceImpl implements  MemberService{
                 score++;
             }
         }
+        GroupDetailsResponse groupDetailsResponse = groupService.getGroupDetail(groupId);
         SubmissionResponse response = new SubmissionResponse();
         response.setResponses(res);
         response.setPosition(position);
         response.setTotalScore(score);
+        response.setGroupDetails(groupDetailsResponse);
         return  response;
     }
 

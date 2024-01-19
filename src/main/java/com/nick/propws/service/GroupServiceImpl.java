@@ -3,6 +3,7 @@ package com.nick.propws.service;
 import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.dto.CreateGroupResponse;
 import com.nick.propws.dto.GroupDetailsResponse;
+import com.nick.propws.dto.MemberDto;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
@@ -23,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class GroupServiceImpl implements GroupService{
@@ -83,19 +86,21 @@ public class GroupServiceImpl implements GroupService{
         newMember.setGroup(myGroup);
         newMember.setUser(user);
         newMember.setScore(0L);
+        newMember.setSubmission_status(0L);
+        newMember.setGroupAdmin(false);
         memberRepository.save(newMember);
         user.getMembers().add(newMember);
         userRepository.save(user);
     }
 
     @Override
-    public ResponseEntity<?> getGroupDetail(Long groupId) throws PropSheetException {
+    public GroupDetailsResponse getGroupDetail(Long groupId) throws PropSheetException {
 
         Optional<Group> findGroup = this.groupRepository.findById(groupId);
         if(findGroup.isEmpty()) {
             throw new PropSheetException("No group found with id " + groupId);
         }
-        return ResponseEntity.ok(mapResponse(findGroup.get()));
+        return mapResponse(findGroup.get());
     }
 
     private GroupDetailsResponse mapResponse(Group g) {
@@ -103,15 +108,24 @@ public class GroupServiceImpl implements GroupService{
         detailsResponse.setName(g.getName());
         detailsResponse.setIcon(g.getIcon());
         detailsResponse.setMemberCount(g.getMembers().size());
-        detailsResponse.setInLead(findCurrentLeader(g.getMembers()));
+        Member m = findCurrentLeader(g.getMembers());
+        MemberDto mDto = new MemberDto();
+        mDto.setName(m.getUser().getName());
+        mDto.setScore(m.getScore());
+        detailsResponse.setInLead(mDto);
         return detailsResponse;
     }
 
-    private Member findCurrentLeader(List<Member> members) {
+
+    @Override
+    public Member findCurrentLeader(List<Member> members) {
         if(members.isEmpty()) {
             return null;
         }
-        return Collections.max(members, Comparator.comparing(Member::getScore));
+        List<Member> submitted = members.stream().filter(member -> member.getScore() != null
+                && member.getSubmission_status() != null
+                && member.getSubmission_status() == 1L).toList();
+        return Collections.max(submitted, Comparator.comparing(Member::getScore));
     }
 
     @Override
@@ -120,17 +134,16 @@ public class GroupServiceImpl implements GroupService{
         if(members.isEmpty()) {
             throw new PropSheetException("No members in group");
         }
-        List<Long> scores = new ArrayList<>();
-        for(Member m : members) {
-            Long score = m.getScore();
-            if(score == null) {
-                score = 0L;
-            }
-            scores.add(score);
-        }
-        Collections.sort(scores);
-        Collections.reverse(scores);
-        int position = scores.indexOf(memberId);
+        List<Member> submittedMembers = members.stream().filter(member ->
+                member.getSubmission_status() != null && member.getSubmission_status() == 1L
+                && member.getScore() != null).toList();
+        List<Member> sortedMembers = submittedMembers.stream()
+                .sorted(Comparator.comparing(Member::getScore).reversed())
+                .toList();
+        int position = IntStream.range(0, sortedMembers.size())
+                .filter(i -> sortedMembers.get(i).getId().equals(memberId))
+                .findFirst()
+                .orElse(-1);
         return position + 1;
     }
 

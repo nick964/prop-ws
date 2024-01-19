@@ -58,6 +58,15 @@ public class ConfigServiceImpl implements ConfigService{
         return configDtos;
     }
 
+    @Override
+    public boolean hasGameStarted() {
+        ConfigSetup configSetup = configServiceRepository.findConfigSetupByRule("game_started");
+        if(configSetup == null) {
+            return false;
+        }
+        return configSetup.isEnabled();
+    }
+
     private ConfigDto mapFromConfigEntity(ConfigSetup c) {
         ConfigDto qDto = new ConfigDto();
         qDto.setRule(c.getRule());

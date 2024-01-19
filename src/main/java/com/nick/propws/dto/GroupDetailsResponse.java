@@ -27,6 +27,6 @@ public class GroupDetailsResponse {
 
     public List<Member> members;
 
-    public Member inLead;
+    public MemberDto inLead;
 
 }

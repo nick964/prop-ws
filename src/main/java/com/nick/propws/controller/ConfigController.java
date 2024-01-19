@@ -27,4 +27,9 @@ public class ConfigController {
         return ResponseEntity.ok(configService.getAllConfigRules());
     }
 
+    @GetMapping("/started")
+    public ResponseEntity<Boolean> hasGameStarted() {
+        return ResponseEntity.ok(configService.hasGameStarted());
+    }
+
 }

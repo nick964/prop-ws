@@ -11,5 +11,7 @@ public interface ConfigService {
 
     List<ConfigDto> getAllConfigRules();
 
+    boolean hasGameStarted();
+
 
 }

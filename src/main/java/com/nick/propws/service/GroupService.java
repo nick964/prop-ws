@@ -4,6 +4,7 @@ import com.nick.propws.dto.CreateGroupReq;
 import com.nick.propws.dto.CreateGroupResponse;
 import com.nick.propws.dto.GroupDetailsResponse;
 import com.nick.propws.entity.Group;
+import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
 import com.nick.propws.exceptions.PropSheetException;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,11 @@ public interface GroupService {
 
     void addUserToGroup(User user, String groupId) throws PropSheetException;
 
-    ResponseEntity<?> getGroupDetail(Long groupId) throws PropSheetException;
+    GroupDetailsResponse getGroupDetail(Long groupId) throws PropSheetException;
 
     int getMemberPositionInGroup(Long memberId, Group g) throws PropSheetException;
+
+    public Member findCurrentLeader(List<Member> members);
 
 
 }
