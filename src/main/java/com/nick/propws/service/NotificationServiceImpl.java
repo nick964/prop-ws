@@ -5,6 +5,7 @@ import com.nick.propws.dto.EmailDto;
 import com.nick.propws.dto.EmailTemplateDto;
 import com.nick.propws.dto.ShareGroupRequest;
 import com.nick.propws.entity.Group;
+import com.nick.propws.entity.Member;
 import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.GroupRepository;
 import jakarta.mail.MessagingException;
@@ -21,6 +22,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -48,9 +52,26 @@ public class NotificationServiceImpl implements NotificationService {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
+            Group g = fetchGroup(req.getGroupId());
+
+            List<Member> members =  g.getMembers().stream().filter(Member::isGroupAdmin).toList();
+            String name = "";
+            if(!members.isEmpty()) {
+                name = members.get(0).getUser().getName();
+            }
+
+            String subject = "You have been invited to join a Superbowl Pool on superbowlproptracker.com!";
+
+            String body =  "You have been invited to join the group " + g.getName() + " on Super Bowl Prop Tracker! " +
+                    "Please sign up using this link: " + deployedHost + g.getId();
+
+            if(name != null && !name.isEmpty()) {
+                body+= "\n" + name + " is currently running this group.";
+            }
+
             helper.setTo(req.getRecipient());
-            helper.setSubject("Test Subject");
-            helper.setText("Yo test", true); // 'true' to indicate HTML content
+            helper.setSubject(subject);
+            helper.setText(body, true); // 'true' to indicate HTML content
             helper.setFrom(smtpSender);
 
             emailSender.send(message);
@@ -66,6 +87,12 @@ public class NotificationServiceImpl implements NotificationService {
             String inviteType = isSMS ? "text" : "email";
             System.out.println("Sending " + inviteType + " invite to " + req.getRecipient());
             Group g = fetchGroup(req.getGroupId());
+
+            List<Member> members =  g.getMembers().stream().filter(Member::isGroupAdmin).toList();
+
+            if(!members.isEmpty()) {
+                String name = members.get(0).getUser().getName();
+            }
 
             HttpHeaders headers = createHeaders();
             HttpEntity<EmailDto> requestEntity = getEmailDtoHttpEntity(req, g, headers, isSMS);
