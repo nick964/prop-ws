@@ -14,4 +14,5 @@ public class ProfileResponse {
 
     public List<MemberDto> members;
 
+
 }

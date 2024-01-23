@@ -100,13 +100,14 @@ public class UserServiceImpl implements UserService{
         groupDto.setName(g.getName());
         groupDto.setIcon(g.getIcon());
         groupDto.setId(g.getId());
+        groupDto.setMemberCount(g.getMembers().size());
         return groupDto;
     }
 
     private MemberDto mapFromGroup(Member m, GroupDto groupDto) {
         MemberDto mDto = new MemberDto();
         mDto.setScore(m.getScore());
-        mDto.setSubmission_status(m.getSubmission_status() == null ? 0L : 1L);
+        mDto.setSubmission_status(m.getSubmission_status() == null || m.getSubmission_status() == 0 ? 0L : 1L);
         mDto.setGroupDto(groupDto);
         return mDto;
     }

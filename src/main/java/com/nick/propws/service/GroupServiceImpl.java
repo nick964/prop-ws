@@ -81,16 +81,21 @@ public class GroupServiceImpl implements GroupService{
         if(g.isEmpty()) {
             throw new PropSheetException("Group not found");
         }
-        Group myGroup = g.get();
-        Member newMember = new Member();
-        newMember.setGroup(myGroup);
-        newMember.setUser(user);
-        newMember.setScore(0L);
-        newMember.setSubmission_status(0L);
-        newMember.setGroupAdmin(false);
-        memberRepository.save(newMember);
-        user.getMembers().add(newMember);
-        userRepository.save(user);
+        Member existingMember = memberRepository.findExistingMemberBeforeAdding(user.getId(), g.get().getId());
+        if(existingMember != null) {
+            System.out.println("User already in group - skipping add");
+        } else {
+            Group myGroup = g.get();
+            Member newMember = new Member();
+            newMember.setGroup(myGroup);
+            newMember.setUser(user);
+            newMember.setScore(0L);
+            newMember.setSubmission_status(0L);
+            newMember.setGroupAdmin(false);
+            memberRepository.save(newMember);
+            user.getMembers().add(newMember);
+            userRepository.save(user);
+        }
     }
 
     @Override

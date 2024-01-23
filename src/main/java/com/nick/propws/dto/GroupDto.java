@@ -17,6 +17,8 @@ public class GroupDto {
     private int groupRole;
 
     private String icon;
+
+    private int memberCount;
     
 
 }
