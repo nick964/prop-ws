@@ -70,6 +70,7 @@ public class AuthController {
                 .collect(Collectors.toList());
         JwtResponse res = new JwtResponse();
         res.setToken(jwt);
+        res.setJwtExpiration(jwtUtil.getJwtExpiration());
         res.setId(userDetails.getId());
         res.setUsername(userDetails.getUsername());
         res.setRoles(roles);
@@ -147,12 +148,14 @@ public class AuthController {
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         jwt = jwtUtil.generateJwtToken(authentication);
+        Date expires = jwtUtil.getJwtExpiration();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> rolesReturn = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
         JwtResponse res = new JwtResponse();
         res.setToken(jwt);
+        res.setJwtExpiration(expires);
         res.setId(userDetails.getId());
         res.setUsername(userDetails.getUsername());
         res.setRoles(rolesReturn);

@@ -16,6 +16,8 @@ public class TrackResponse {
 
     public String correctAnswer;
 
+    public Double lineValue;
+
     public boolean isCorrect;
 
 }

@@ -102,6 +102,7 @@ public class MemberServiceImpl implements  MemberService{
     private static TrackResponse getTrackResponse(MemberAnswer ans) {
         TrackResponse trackResponse = new TrackResponse();
         trackResponse.setQuestionText(ans.getQuestion().getText());
+        trackResponse.setLineValue(ans.getQuestion().getLine_value());
         trackResponse.setSection(ans.getQuestion().getSection());
         trackResponse.setCorrect(ans.getScore() != null && ans.getScore() == 1);
         trackResponse.setAnswer(ans.getAnswer());
