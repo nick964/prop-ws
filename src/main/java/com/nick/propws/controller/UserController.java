@@ -6,9 +6,12 @@ import com.nick.propws.dto.UserDto;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.User;
 import com.nick.propws.service.GroupService;
+import com.nick.propws.service.StoreService;
 import com.nick.propws.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -18,6 +21,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    StoreService storageService;
 
     @GetMapping("/find")
     public @ResponseBody User getUser(@RequestParam String userName) {
@@ -42,6 +48,12 @@ public class UserController {
     @GetMapping("/search")
     public @ResponseBody List<UserDto> searchUsers(@RequestParam String searchKey) {
         return userService.searchUsers(searchKey);
+    }
+
+    @PostMapping("/{id}/upload-image")
+    public ResponseEntity<String> uploadProfileImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
+        String url = storageService.uploadFile(file);
+        return ResponseEntity.ok("File uploaded successfully at " + url);
     }
 
 
