@@ -40,6 +40,9 @@ public class GroupServiceImpl implements GroupService{
     MemberRepository memberRepository;
 
     @Autowired
+    StoreService storeService;
+
+    @Autowired
     UserUtil userUtil;
 
     @Value("${upload.dir}")
@@ -53,15 +56,22 @@ public class GroupServiceImpl implements GroupService{
         Group g = new Group();
 
         g.setName(createGroupReq.getName());
-        g.setIcon(createGroupReq.getIcon());
+        g.setDescription(createGroupReq.getDescription());
+
         g.setGroupKey(UUID.randomUUID().toString());
 
+        if(createGroupReq.getIcon() != null) {
+            String groupIcon = storeService.uploadFile(createGroupReq.getIcon());
+            g.setIcon(groupIcon);
+        }
         Group saved = groupRepository.save(g);
 
         Member m = new Member();
         m.setGroup(saved);
         m.setUser(user);
         m.setGroupAdmin(true);
+        m.setScore(0L);
+        m.setSubmission_status(0L);
         memberRepository.save(m);
 
         CreateGroupResponse res = new CreateGroupResponse();

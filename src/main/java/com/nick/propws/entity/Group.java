@@ -15,6 +15,8 @@ public class Group {
 
     private String name;
 
+    private String description;
+
     private String groupKey;
 
     private int groupRole;

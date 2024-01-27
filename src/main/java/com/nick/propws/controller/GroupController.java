@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController()
 @RequestMapping("groups")
@@ -29,10 +30,17 @@ public class GroupController {
     NotificationService twilioService;
 
     @PostMapping("/create")
-    public @ResponseBody ResponseEntity<CreateGroupResponse> createGroup(@RequestBody CreateGroupReq createGroupReq) {
+    public @ResponseBody ResponseEntity<CreateGroupResponse> createGroup(
+            @RequestParam("name") String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestPart(value = "groupIcon", required = false) MultipartFile picture) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl loggedInUser = (UserDetailsImpl) authentication.getPrincipal();
         String userName = loggedInUser.getUsername();
+        CreateGroupReq createGroupReq = new CreateGroupReq();
+        createGroupReq.setName(name);
+        createGroupReq.setDescription(description);
+        createGroupReq.setIcon(picture);
         return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
     }
 

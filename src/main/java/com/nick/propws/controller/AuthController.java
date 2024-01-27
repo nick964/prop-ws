@@ -11,6 +11,7 @@ import com.nick.propws.repository.GroupRepository;
 import com.nick.propws.repository.RoleRepository;
 import com.nick.propws.repository.UserRepository;
 import com.nick.propws.service.GroupService;
+import com.nick.propws.service.StoreService;
 import com.nick.propws.service.UserDetailsImpl;
 import com.nick.propws.util.JwtUtil;
 import io.micrometer.common.util.StringUtils;
@@ -23,10 +24,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,6 +41,8 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     private JwtUtil jwtUtil;
 
+    private StoreService storageService;
+
     @Value("${propsheet.oauth.pw}")
     private String oauthPw;
 
@@ -50,13 +51,15 @@ public class AuthController {
                           RoleRepository roleRepository,
                           AuthenticationManager authenticationManager,
                           JwtUtil jwtUtil,
-                          GroupService groupService) {
+                          GroupService groupService,
+                          StoreService storageService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.groupService = groupService;
         this.jwtUtil = jwtUtil;
+        this.storageService = storageService;
     }
 
     @PostMapping("/signin")
@@ -78,14 +81,20 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+    public ResponseEntity<?> signup(
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam(value = "groupId", required = false) String groupId,
+            @RequestPart(value = "picture", required = false) MultipartFile picture) {
+        if (userRepository.existsByUsername(email)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("username is already taken");
         }
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(email)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("email is already taken");
         }
-        String hashedPassword = passwordEncoder.encode(signUpRequest.getPassword());
+        String hashedPassword = passwordEncoder.encode(password);
         Set<Role> roles = new HashSet<>();
         Optional<Role> userRole = roleRepository.findByName(ERole.ROLE_USER);
         if (userRole.isEmpty()) {
@@ -93,17 +102,21 @@ public class AuthController {
         }
         roles.add(userRole.get());
         User user = new User();
-        user.setUsername(signUpRequest.getEmail());
-        user.setEmail(signUpRequest.getEmail());
-        user.setName(signUpRequest.getFirstName() + " " + signUpRequest.getLastName());
+        user.setUsername(email);
+        user.setEmail(email);
+        user.setName(firstName + " " + lastName);
         user.setPassword(hashedPassword);
         user.setRoles(roles);
         user.setProvider("credentials");
+        if(picture != null && !picture.isEmpty()) {
+            String url = storageService.uploadFile(picture);
+            user.setIcon(url);
+        }
         User us = userRepository.save(user);
-        if(!StringUtils.isEmpty(signUpRequest.getGroupId()))
+        if(!StringUtils.isEmpty(groupId))
         {
             try {
-                this.groupService.addUserToGroup(user, signUpRequest.getGroupId());
+                this.groupService.addUserToGroup(user, groupId);
             } catch (Exception e) {
                 System.out.println("Error adding user to group");
                 return ResponseEntity.ok("Error adding group");
@@ -135,6 +148,7 @@ public class AuthController {
             }
             roles.add(userRole.get());
             User user = new User();
+            user.setName(signUpRequest.getName());
             user.setUsername(signUpRequest.getUsername());
             user.setEmail(signUpRequest.getEmail());
             user.setProvider(signUpRequest.getProvider());
