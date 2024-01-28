@@ -22,8 +22,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +45,10 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Autowired
+    private TemplateEngine templateEngine;
+
+
     @Override
     public ResponseEntity<String> sendText(ShareGroupRequest req) {
         return sendNotification(req, true);
@@ -49,10 +57,23 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public ResponseEntity<String> sendEmail(ShareGroupRequest req) throws PropSheetException {
         try {
+            Context thymeleafContext = new Context();
+            Map<String, Object> templateModel = new HashMap<>();
+
+
+
+
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
             Group g = fetchGroup(req.getGroupId());
+            templateModel.put("groupName", g.getName());
+            templateModel.put("name", req.getName());
+            templateModel.put("greeting", (req.getName() != null && req.getName() != "") ?
+                    ("Hello " + req.getName() + ",") : "Hello,");
+            templateModel.put("groupId", g.getId());
+            thymeleafContext.setVariables(templateModel);
+            String htmlBody = templateEngine.process("joinRequest", thymeleafContext);
 
             List<Member> members =  g.getMembers().stream().filter(Member::isGroupAdmin).toList();
             String name = "";
@@ -71,7 +92,7 @@ public class NotificationServiceImpl implements NotificationService {
 
             helper.setTo(req.getRecipient());
             helper.setSubject(subject);
-            helper.setText(body, true); // 'true' to indicate HTML content
+            helper.setText(htmlBody, true); // 'true' to indicate HTML content
             helper.setFrom(smtpSender);
 
             emailSender.send(message);

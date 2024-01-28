@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Bowl Prop Tracker Invitation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+        }
+        .header img {
+            max-width: 180px;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #008CBA;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #005f73;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://propsheetbucket.s3.amazonaws.com/1706389611530_SuperBowlLogo+(2).png" alt="Super Bowl Prop Tracker Logo"/>
+    </div>
+    <div class="content">
+        <h2>You're Invited!</h2>
+        <p th:text="${greeting}"></p><br>
+        <p>You have been invited to join the group <strong th:text="${groupName}">[GroupName]</strong> on Super Bowl Prop Tracker!</p>
+        <p>Get ready to elevate your Super Bowl experience! Track your prop bets, compete with friends, and see who emerges as the Super Bowl betting champion!</p>
+        <a th:href="@{'https://www.superbowlproptracker.com/signup?groupid=' + ${groupId}}" class="button">Sign Up Now</a>
+
+    </div>
+    <div class="footer">
+        Questions? Contact us at <a href="mailto:support@superbowlproptracker.com">support@superbowlproptracker.com</a>
+    </div>
+</div>
+</body>
+</html>

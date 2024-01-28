@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,10 @@ public class QuestionServiceImpl  implements QuestionService{
     public List<QuestionSectionDto> getAllQuestions() {
 
         List<Question> allQuestions = questionRepository.findAll();
+
+        if(allQuestions != null && !allQuestions.isEmpty()) {
+            allQuestions = allQuestions.stream().sorted(Comparator.comparing(Question::getSection)).collect(Collectors.toList());
+        }
 
 
         List<QuestionSectionDto> questionResponse = new ArrayList<>();
