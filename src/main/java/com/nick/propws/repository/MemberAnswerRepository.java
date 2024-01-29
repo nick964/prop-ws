@@ -18,5 +18,10 @@ public interface MemberAnswerRepository extends JpaRepository<MemberAnswer, Long
             "(select answer from master_answers where id = :masterAnswerId)")
     void updateScoresAfterSubmission(int questionId, int masterAnswerId);
 
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE members m SET m.score = (SELECT SUM(ma.score) FROM member_answers ma WHERE ma.member_id = m.id)", nativeQuery = true)
+    void updateMemberScores();
+
     List<MemberAnswer> findMemberAnswersByMember(Member m);
 }

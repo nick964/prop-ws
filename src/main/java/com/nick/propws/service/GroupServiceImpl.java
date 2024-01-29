@@ -6,6 +6,7 @@ import com.nick.propws.dto.GroupDetailsResponse;
 import com.nick.propws.dto.MemberDto;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
+import com.nick.propws.entity.MemberAnswer;
 import com.nick.propws.entity.User;
 import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.repository.GroupRepository;
@@ -126,9 +127,22 @@ public class GroupServiceImpl implements GroupService{
         Member m = findCurrentLeader(g.getMembers());
         MemberDto mDto = new MemberDto();
         mDto.setName(m.getUser().getName());
-        mDto.setScore(m.getScore());
+        mDto.setScore(getLeaderScore(m));
         detailsResponse.setInLead(mDto);
         return detailsResponse;
+    }
+
+    private Long getLeaderScore(Member m) {
+        Long score = 0L;
+        List<MemberAnswer> answers = m.getAnswers();
+        if(answers != null && !answers.isEmpty()) {
+            for(MemberAnswer answer : answers) {
+                if(answer.getScore() != null) {
+                    score += answer.getScore();
+                }
+            }
+        }
+        return score;
     }
 
 
