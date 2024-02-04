@@ -23,6 +23,8 @@ public class Group {
 
     private String icon;
 
+    private String iconObject;
+
     @OneToMany(mappedBy = "group")
     private List<Member> members;
 

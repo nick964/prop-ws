@@ -34,6 +34,8 @@ public class User {
 
     private String icon;
 
+    private String iconObject;
+
 
     @OneToMany(mappedBy = "user")
     private List<Member> members;
@@ -130,5 +132,13 @@ public class User {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public String getIconObject() {
+        return iconObject;
+    }
+
+    public void setIconObject(String iconObject) {
+        this.iconObject = iconObject;
     }
 }

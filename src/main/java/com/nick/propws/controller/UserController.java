@@ -50,11 +50,4 @@ public class UserController {
         return userService.searchUsers(searchKey);
     }
 
-    @PostMapping("/{id}/upload-image")
-    public ResponseEntity<String> uploadProfileImage(@PathVariable String id, @RequestParam("file") MultipartFile file) {
-        String url = storageService.uploadFile(file);
-        return ResponseEntity.ok("File uploaded successfully at " + url);
-    }
-
-
 }

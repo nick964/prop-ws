@@ -1,13 +1,14 @@
 package com.nick.propws.controller;
 
-import com.nick.propws.dto.CreateGroupReq;
-import com.nick.propws.dto.CreateGroupResponse;
-import com.nick.propws.dto.ShareGroupRequest;
+import com.nick.propws.dto.*;
 import com.nick.propws.entity.User;
+import com.nick.propws.exceptions.PropSheetException;
 import com.nick.propws.service.GroupService;
 import com.nick.propws.service.NotificationService;
 import com.nick.propws.service.UserDetailsImpl;
 import com.nick.propws.util.UserUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @RestController()
 @RequestMapping("groups")
 public class GroupController {
+
+    Logger logger = LoggerFactory.getLogger(GroupController.class);
 
     @Autowired
     GroupService groupService;
@@ -51,9 +55,20 @@ public class GroupController {
         return ResponseEntity.ok(Boolean.TRUE);
     }
 
-    @PostMapping("/details")
-    public @ResponseBody ResponseEntity<CreateGroupResponse> getDetails(@RequestParam Long groupId) {
-        return null;
+    @GetMapping("/details")
+    public @ResponseBody ResponseEntity<BasicGroupDetails> getDetails(@RequestParam Long groupId) {
+        BasicGroupDetails res = new BasicGroupDetails();
+        try {
+            res = groupService.getBasicDetails(groupId);
+            if(res == null) {
+                logger.error("Error: No group details found for group id " + groupId);
+                return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(res, HttpStatus.OK);
+        } catch(PropSheetException e) {
+            logger.error("Error occurred fetching group details: " + e.getMessage());
+            return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/share")
@@ -65,6 +80,21 @@ public class GroupController {
         } else {
             return new ResponseEntity<>("Invite type is not supported", HttpStatus.BAD_REQUEST);
         }
+    }
 
+    @PostMapping("/delete")
+    public @ResponseBody DeleteGroupResponse deleteGroup(@RequestBody DeleteGroupRequest deleteGroupRequest) {
+        User user = userUtil.getUserFromAuth();
+        return groupService.deleteGroup(user, deleteGroupRequest.getGroupId());
+    }
+
+    @GetMapping("/results")
+    public @ResponseBody ResponseEntity<GroupResultsResponse> getGroupResults(@RequestParam("groupId") Long groupId) {
+        return ResponseEntity.ok(groupService.getResultsForGroup(groupId));
+    }
+
+    @GetMapping("/leaderboard")
+    public @ResponseBody ResponseEntity<GroupResultsResponse> getLeaderboard() {
+        return ResponseEntity.ok(groupService.getGlobalLeaderboard());
     }
 }

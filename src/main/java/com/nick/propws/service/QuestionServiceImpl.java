@@ -51,6 +51,7 @@ public class QuestionServiceImpl  implements QuestionService{
                 questionSectionDto.setName(sec);
                 questionSectionDto.setId(count);
                 questionSectionDto.getQuestions().add(mapFromQuestion(q));
+                questionSectionDto.setSortOrder(q.getSection_order());
             } else  {
                 questionSectionDto.getQuestions().add(mapFromQuestion(q));
             }
@@ -58,9 +59,14 @@ public class QuestionServiceImpl  implements QuestionService{
             currentSection = sec;
         }
         questionResponse.add(questionSectionDto);
+        // Assuming questionSections is your original list
+        List<QuestionSectionDto> sortedQuestionSections;
+        sortedQuestionSections = questionResponse.stream()
+                .sorted(Comparator.comparingInt(QuestionSectionDto::getSortOrder))
+                .toList();
 
 
-        return questionResponse;
+        return sortedQuestionSections;
     }
 
     private QuestionDto mapFromQuestion(Question q) {

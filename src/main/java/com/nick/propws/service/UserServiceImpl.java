@@ -8,6 +8,7 @@ import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
 import com.nick.propws.repository.UserRepository;
+import com.nick.propws.util.DtoMapper;
 import com.nick.propws.util.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.nick.propws.util.DtoMapper.mapFromGroup;
+import static com.nick.propws.util.DtoMapper.mapMember;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -70,9 +74,7 @@ public class UserServiceImpl implements UserService{
         }
         ProfileResponse profileResponse = new ProfileResponse();
         for(Member m : user.getMembers()) {
-            Group g = m.getGroup();
-            GroupDto gDto = mapFromGroup(g);
-            MemberDto memberDto = mapFromGroup(m, gDto);
+            MemberDto memberDto = mapMember(m, true);
             profileResponse.getMembers().add(memberDto);
         }
         return profileResponse;
@@ -85,7 +87,7 @@ public class UserServiceImpl implements UserService{
             List<User> users =  userRepository.findUsersByKey(searchParam);
             List<UserDto> userDtos = new ArrayList<>();
             for(User u : users) {
-                UserDto userDto = mapFromUser(u);
+                UserDto userDto = DtoMapper.mapFromUser(u);
                 userDtos.add(userDto);
             }
             return userDtos;
@@ -94,30 +96,5 @@ public class UserServiceImpl implements UserService{
         }
     }
 
-    private GroupDto mapFromGroup(Group g) {
-        GroupDto groupDto = new GroupDto();
-        groupDto.setGroupKey(g.getGroupKey());
-        groupDto.setName(g.getName());
-        groupDto.setIcon(g.getIcon());
-        groupDto.setId(g.getId());
-        groupDto.setMemberCount(g.getMembers().size());
-        return groupDto;
-    }
 
-    private MemberDto mapFromGroup(Member m, GroupDto groupDto) {
-        MemberDto mDto = new MemberDto();
-        mDto.setScore(m.getScore());
-        mDto.setSubmission_status(m.getSubmission_status() == null || m.getSubmission_status() == 0 ? 0L : 1L);
-        mDto.setGroupDto(groupDto);
-        return mDto;
-    }
-
-    private UserDto mapFromUser(User u) {
-        UserDto userDto = new UserDto();
-        userDto.setId(u.getId());
-        userDto.setName(u.getName());
-        userDto.setUsername(u.getUsername());
-        userDto.setEmail(u.getEmail());
-        return userDto;
-    }
 }

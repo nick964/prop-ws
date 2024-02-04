@@ -16,6 +16,10 @@ public class MemberDto {
     private Long score;
 
     private GroupDto groupDto;
+
+    private String icon;
+
+    private boolean isGroupAdmin;
     
 
 }

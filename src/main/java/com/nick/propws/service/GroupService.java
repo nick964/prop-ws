@@ -1,8 +1,6 @@
 package com.nick.propws.service;
 
-import com.nick.propws.dto.CreateGroupReq;
-import com.nick.propws.dto.CreateGroupResponse;
-import com.nick.propws.dto.GroupDetailsResponse;
+import com.nick.propws.dto.*;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.User;
@@ -22,6 +20,14 @@ public interface GroupService {
     int getMemberPositionInGroup(Long memberId, Group g) throws PropSheetException;
 
     public Member findCurrentLeader(List<Member> members);
+
+    DeleteGroupResponse deleteGroup(User user, Long groupId);
+
+    GroupResultsResponse getResultsForGroup(Long groupId);
+
+    GroupResultsResponse getGlobalLeaderboard();
+
+    BasicGroupDetails getBasicDetails(Long groupId);
 
 
 }

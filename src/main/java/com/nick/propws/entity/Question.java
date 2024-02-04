@@ -13,7 +13,11 @@ public class Question {
 
     private String text;
 
+    private String description;
+
     private String section;
+
+    private int section_order;
 
     private int question_type;
 
@@ -90,5 +94,22 @@ public class Question {
 
     public void setMasterAnswer(MasterAnswer masterAnswer) {
         this.masterAnswer = masterAnswer;
+    }
+
+
+    public int getSection_order() {
+        return section_order;
+    }
+
+    public void setSection_order(int section_order) {
+        this.section_order = section_order;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

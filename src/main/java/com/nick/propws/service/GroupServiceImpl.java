@@ -1,9 +1,6 @@
 package com.nick.propws.service;
 
-import com.nick.propws.dto.CreateGroupReq;
-import com.nick.propws.dto.CreateGroupResponse;
-import com.nick.propws.dto.GroupDetailsResponse;
-import com.nick.propws.dto.MemberDto;
+import com.nick.propws.dto.*;
 import com.nick.propws.entity.Group;
 import com.nick.propws.entity.Member;
 import com.nick.propws.entity.MemberAnswer;
@@ -27,6 +24,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.nick.propws.util.DtoMapper.mapMember;
 
 @Service
 public class GroupServiceImpl implements GroupService{
@@ -62,8 +61,9 @@ public class GroupServiceImpl implements GroupService{
         g.setGroupKey(UUID.randomUUID().toString());
 
         if(createGroupReq.getIcon() != null) {
-            String groupIcon = storeService.uploadFile(createGroupReq.getIcon());
-            g.setIcon(groupIcon);
+            UploadFileDto groupIcon = storeService.uploadFile(createGroupReq.getIcon());
+            g.setIcon(groupIcon.getIconUrl());
+            g.setIconObject(groupIcon.getObjectName());
         }
         Group saved = groupRepository.save(g);
 
@@ -127,12 +127,12 @@ public class GroupServiceImpl implements GroupService{
         Member m = findCurrentLeader(g.getMembers());
         MemberDto mDto = new MemberDto();
         mDto.setName(m.getUser().getName());
-        mDto.setScore(getLeaderScore(m));
+        mDto.setScore(getMemberScore(m));
         detailsResponse.setInLead(mDto);
         return detailsResponse;
     }
 
-    private Long getLeaderScore(Member m) {
+    private Long getMemberScore(Member m) {
         Long score = 0L;
         List<MemberAnswer> answers = m.getAnswers();
         if(answers != null && !answers.isEmpty()) {
@@ -158,6 +158,102 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
+    public DeleteGroupResponse deleteGroup(User user, Long groupId) {
+        DeleteGroupResponse res = new DeleteGroupResponse();
+
+        Group group = groupRepository.findGroupById(groupId);
+        if(group == null) {
+            res.setMessage("Group not found.");
+            return res;
+        }
+
+        List<Member> members = group.getMembers();
+        Long userId = user.getId();
+        Member member = members.stream().filter(m -> m.getUser().getId().equals(userId)).findFirst().orElse(null);
+        if(member == null) {
+            res.setMessage("You are not a member of this group.");
+            return res;
+        }
+
+        if(!member.isGroupAdmin()) {
+            res.setMessage("You are not an admin of this group.");
+            return res;
+        }
+
+        memberRepository.deleteAll(members);
+        if(group.getIconObject() != null && !group.getIconObject().isEmpty()) {
+            storeService.deleteFile(group.getIconObject());
+        }
+
+        res.setMessage("Group deleted successfully.");
+        res.isDeleted = true;
+        return res;
+    }
+
+    @Override
+    public GroupResultsResponse getResultsForGroup(Long groupId) {
+        GroupResultsResponse res = new GroupResultsResponse();
+        Optional<Group> group = groupRepository.findById(groupId);
+        if(group.isEmpty()) {
+            res.setSuccess(false);
+            res.setGameOver(false);
+            return res;
+        }
+        Group g = group.get();
+        List<Member> members = g.getMembers();
+        if(members.isEmpty()) {
+            res.setSuccess(false);
+            res.setGameOver(false);
+            return res;
+        }
+        List<Member> submittedMembers = members.stream().filter(member ->
+                member.getSubmission_status() != null && member.getSubmission_status() == 1L
+                && member.getScore() != null).toList();
+        if(submittedMembers.isEmpty()) {
+            res.setSuccess(false);
+            res.setGameOver(false);
+            return res;
+        }
+        List<Member> sortedMembers = submittedMembers.stream()
+                .sorted(Comparator.comparing(Member::getScore).reversed())
+                .toList();
+        Member winner = sortedMembers.get(0);
+        MemberDto winnerDto = mapMember(winner, false);
+        res.setWinner(winnerDto);
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for(Member m : sortedMembers) {
+            memberDtos.add(mapMember(m, false));
+        }
+        res.setMembers(memberDtos);
+        res.setSuccess(true);
+        res.setGameOver(true);
+        return res;
+    }
+
+    @Override
+    public GroupResultsResponse getGlobalLeaderboard() {
+        GroupResultsResponse res = new GroupResultsResponse();
+        res.success = false;
+        List<Member> members = memberRepository.findAll();
+        if(members.isEmpty()) {
+            return res;
+        }
+        List<Member> submittedMembers = members.stream().filter(member ->
+                member.getSubmission_status() != null && member.getSubmission_status() == 1L
+                && member.getScore() != null).toList();
+        List<Member> sortedMembers = submittedMembers.stream()
+                .sorted(Comparator.comparing(Member::getScore).reversed())
+                .toList();
+        List<MemberDto> memberDtos = new ArrayList<>();
+        for(Member m : sortedMembers) {
+            memberDtos.add(mapMember(m, false));
+        }
+        res.success = true;
+        res.members = memberDtos;
+        return res;
+    }
+
+    @Override
     public int getMemberPositionInGroup(Long memberId, Group g) throws PropSheetException {
         List<Member> members = g.getMembers();
         if(members.isEmpty()) {
@@ -176,26 +272,25 @@ public class GroupServiceImpl implements GroupService{
         return position + 1;
     }
 
-
-    private String saveImage(MultipartFile image) {
-        try {
-            // Generate a unique filename
-            String fileName = StringUtils.cleanPath(UUID.randomUUID().toString() + "_" + image.getOriginalFilename());
-
-            // Resolve the upload directory
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-
-            // Ensure the directory exists, create if not
-            Files.createDirectories(uploadPath);
-
-            // Save the file to the server
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(image.getInputStream(), filePath);
-
-            // Build and return the URL
-            return "/uploads/" + fileName; // Adjust the URL structure as needed
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to save image", ex);
+    @Override
+    public BasicGroupDetails getBasicDetails(Long groupId) {
+        Optional<Group> group = groupRepository.findById(groupId);
+        if(group.isEmpty()) {
+            return null;
         }
+        Group g = group.get();
+        BasicGroupDetails details = new BasicGroupDetails();
+        details.setId(g.getId());
+        details.setName(g.getName());
+        details.setDescription(g.getDescription());
+        details.setIcon(g.getIcon());
+        if(g.getMembers() != null && !g.getMembers().isEmpty()) {
+            Member admin = g.getMembers().stream().filter(Member::isGroupAdmin).findFirst().orElse(null);
+            if(admin != null) {
+                details.setAdmin(mapMember(admin, false));
+            }
+        }
+        return details;
     }
+
 }

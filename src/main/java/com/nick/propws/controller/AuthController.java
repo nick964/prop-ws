@@ -1,9 +1,6 @@
 package com.nick.propws.controller;
 
-import com.nick.propws.dto.JwtResponse;
-import com.nick.propws.dto.OauthSignup;
-import com.nick.propws.dto.SignInRequest;
-import com.nick.propws.dto.SignUpRequest;
+import com.nick.propws.dto.*;
 import com.nick.propws.entity.ERole;
 import com.nick.propws.entity.Role;
 import com.nick.propws.entity.User;
@@ -113,10 +110,11 @@ public class AuthController {
         user.setRoles(roles);
         user.setProvider("credentials");
         if(picture != null && !picture.isEmpty()) {
-            String url = storageService.uploadFile(picture);
-            user.setIcon(url);
+            UploadFileDto uploadFile = storageService.uploadFile(picture);
+            user.setIcon(uploadFile.getIconUrl());
+            user.setIconObject(uploadFile.getObjectName());
         }
-        User us = userRepository.save(user);
+        userRepository.save(user);
         if(!StringUtils.isEmpty(groupId))
         {
             try {
