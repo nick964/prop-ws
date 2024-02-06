@@ -15,7 +15,7 @@ public class QuestionSectionDto {
 
 
     private Long id;
-    private int sortOrder;
+    private double sortOrder;
     private String name;
     private List<QuestionDto> questions;
     private List<ConfigDto> configRules;

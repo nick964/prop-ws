@@ -62,7 +62,7 @@ public class QuestionServiceImpl  implements QuestionService{
         // Assuming questionSections is your original list
         List<QuestionSectionDto> sortedQuestionSections;
         sortedQuestionSections = questionResponse.stream()
-                .sorted(Comparator.comparingInt(QuestionSectionDto::getSortOrder))
+                .sorted(Comparator.comparingDouble(QuestionSectionDto::getSortOrder))
                 .toList();
 
 

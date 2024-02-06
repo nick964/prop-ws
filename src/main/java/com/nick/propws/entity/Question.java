@@ -17,7 +17,7 @@ public class Question {
 
     private String section;
 
-    private int section_order;
+    private double section_order;
 
     private int question_type;
 
@@ -97,11 +97,11 @@ public class Question {
     }
 
 
-    public int getSection_order() {
+    public double getSection_order() {
         return section_order;
     }
 
-    public void setSection_order(int section_order) {
+    public void setSection_order(double section_order) {
         this.section_order = section_order;
     }
 

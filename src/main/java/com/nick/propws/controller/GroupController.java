@@ -38,14 +38,22 @@ public class GroupController {
             @RequestParam("name") String name,
             @RequestParam(value = "description", required = false) String description,
             @RequestPart(value = "groupIcon", required = false) MultipartFile picture) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl loggedInUser = (UserDetailsImpl) authentication.getPrincipal();
-        String userName = loggedInUser.getUsername();
-        CreateGroupReq createGroupReq = new CreateGroupReq();
-        createGroupReq.setName(name);
-        createGroupReq.setDescription(description);
-        createGroupReq.setIcon(picture);
-        return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
+        logger.info("Recieved request for group creation");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetailsImpl loggedInUser = (UserDetailsImpl) authentication.getPrincipal();
+            String userName = loggedInUser.getUsername();
+            CreateGroupReq createGroupReq = new CreateGroupReq();
+            createGroupReq.setName(name);
+            createGroupReq.setDescription(description);
+            createGroupReq.setIcon(picture);
+            return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
+        } catch (Exception e) {
+            logger.error("Error occurred during group upload");
+            logger.error(e.getMessage());
+            return ResponseEntity.badRequest().body(new CreateGroupResponse());
+        }
+
     }
 
     @PostMapping("/addUser")
