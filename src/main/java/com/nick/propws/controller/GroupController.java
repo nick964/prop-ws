@@ -40,6 +40,7 @@ public class GroupController {
             @RequestPart(value = "groupIcon", required = false) MultipartFile picture) {
         logger.info("Recieved request for group creation");
         try {
+
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetailsImpl loggedInUser = (UserDetailsImpl) authentication.getPrincipal();
             String userName = loggedInUser.getUsername();

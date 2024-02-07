@@ -72,12 +72,15 @@ public class AuthController {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
+        User user = userRepository.findUserByUsername(signInRequest.getUsername());
         JwtResponse res = new JwtResponse();
         res.setToken(jwt);
         res.setJwtExpiration(jwtUtil.getJwtExpiration());
         res.setId(userDetails.getId());
         res.setUsername(userDetails.getUsername());
         res.setRoles(roles);
+        res.setIcon(user.getIcon());
+        res.setName(user.getName());
         return ResponseEntity.ok(res);
     }
 
@@ -126,6 +129,7 @@ public class AuthController {
 
         }
         JwtResponse res = new JwtResponse();
+        res.setIcon(user.getIcon());
         return ResponseEntity.ok(res);
     }
 
@@ -133,8 +137,9 @@ public class AuthController {
     public ResponseEntity<?> oauthSignup(@RequestBody OauthSignup signUpRequest) {
         Authentication authentication;
         String jwt;
+        User user;
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            User user = userRepository.findUserByUsername(signUpRequest.getUsername());
+            user = userRepository.findUserByUsername(signUpRequest.getUsername());
             if(!user.getProvider().equals(signUpRequest.getProvider())) {
                 JwtResponse response = new JwtResponse();
                 response.setSuccess(false);
@@ -149,7 +154,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("role not found");
             }
             roles.add(userRole.get());
-            User user = new User();
+            user = new User();
             user.setName(signUpRequest.getName());
             user.setUsername(signUpRequest.getUsername());
             user.setEmail(signUpRequest.getEmail());
@@ -176,6 +181,8 @@ public class AuthController {
         res.setId(userDetails.getId());
         res.setUsername(userDetails.getUsername());
         res.setRoles(rolesReturn);
+        res.setIcon(user.getIcon());
+        res.setName(user.getName());
         return ResponseEntity.ok(res);
     }
 }

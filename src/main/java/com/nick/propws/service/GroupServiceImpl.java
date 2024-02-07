@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.nick.propws.util.DtoMapper.mapFromGroup;
 import static com.nick.propws.util.DtoMapper.mapMember;
 
 @Service
@@ -124,6 +125,7 @@ public class GroupServiceImpl implements GroupService{
         detailsResponse.setName(g.getName());
         detailsResponse.setIcon(g.getIcon());
         detailsResponse.setMemberCount(g.getMembers().size());
+        detailsResponse.setId(g.getId());
         Member m = findCurrentLeader(g.getMembers());
         MemberDto mDto = new MemberDto();
         mDto.setName(m.getUser().getName());
@@ -206,22 +208,27 @@ public class GroupServiceImpl implements GroupService{
             res.setGameOver(false);
             return res;
         }
+        List<Member> unsubmittedMembers = members.stream().filter(member ->
+                member.getSubmission_status() == null || member.getSubmission_status() == 0L).toList();
+
         List<Member> submittedMembers = members.stream().filter(member ->
                 member.getSubmission_status() != null && member.getSubmission_status() == 1L
                 && member.getScore() != null).toList();
-        if(submittedMembers.isEmpty()) {
-            res.setSuccess(false);
-            res.setGameOver(false);
-            return res;
-        }
+
         List<Member> sortedMembers = submittedMembers.stream()
                 .sorted(Comparator.comparing(Member::getScore).reversed())
                 .toList();
-        Member winner = sortedMembers.get(0);
-        MemberDto winnerDto = mapMember(winner, false);
-        res.setWinner(winnerDto);
+        if(!sortedMembers.isEmpty()) {
+            Member winner = sortedMembers.get(0);
+            MemberDto winnerDto = mapMember(winner, false);
+            res.setWinner(winnerDto);
+        }
+
         List<MemberDto> memberDtos = new ArrayList<>();
         for(Member m : sortedMembers) {
+            memberDtos.add(mapMember(m, false));
+        }
+        for(Member m : unsubmittedMembers) {
             memberDtos.add(mapMember(m, false));
         }
         res.setMembers(memberDtos);
@@ -246,7 +253,7 @@ public class GroupServiceImpl implements GroupService{
                 .toList();
         List<MemberDto> memberDtos = new ArrayList<>();
         for(Member m : sortedMembers) {
-            memberDtos.add(mapMember(m, false));
+            memberDtos.add(mapMember(m, true));
         }
         res.success = true;
         res.members = memberDtos;
