@@ -58,6 +58,8 @@ public class GroupServiceImpl implements GroupService{
 
         g.setName(createGroupReq.getName());
         g.setDescription(createGroupReq.getDescription());
+        g.setVenmoLink(createGroupReq.getVenmoLink());
+        g.setGroupCost(createGroupReq.getGroupCost());
 
         g.setGroupKey(UUID.randomUUID().toString());
 
@@ -81,7 +83,7 @@ public class GroupServiceImpl implements GroupService{
         res.setKey(g.getGroupKey());
         res.setName(g.getName());
         res.setDescription(createGroupReq.getDescription());
-
+        res.setVenmoLink(createGroupReq.getVenmoLink());
 
         return res;
     }

@@ -14,5 +14,8 @@ public class CreateGroupResponse {
     public String icon;
 
     public String description;
+    public String venmoLink;
+
+    public Integer groupCost;
 
 }

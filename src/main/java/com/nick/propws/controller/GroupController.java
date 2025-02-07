@@ -37,7 +37,9 @@ public class GroupController {
     public @ResponseBody ResponseEntity<CreateGroupResponse> createGroup(
             @RequestParam("name") String name,
             @RequestParam(value = "description", required = false) String description,
-            @RequestPart(value = "groupIcon", required = false) MultipartFile picture) {
+            @RequestPart(value = "groupIcon", required = false) MultipartFile picture,
+            @RequestParam(value = "venmoLink", required = false) String venmoLink,
+            @RequestParam(value = "groupCost", required = false) Integer groupCost) {
         logger.info("Recieved request for group creation");
         try {
 
@@ -48,6 +50,7 @@ public class GroupController {
             createGroupReq.setName(name);
             createGroupReq.setDescription(description);
             createGroupReq.setIcon(picture);
+            createGroupReq.setVenmoLink(venmoLink);
             return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
         } catch (Exception e) {
             logger.error("Error occurred during group upload");

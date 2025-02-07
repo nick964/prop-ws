@@ -25,6 +25,10 @@ public class Group {
 
     private String iconObject;
 
+    private String venmoLink;
+
+    private Integer groupCost;
+
     @OneToMany(mappedBy = "group")
     private List<Member> members;
 

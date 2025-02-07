@@ -12,4 +12,8 @@ public class CreateGroupReq {
 
     public String description;
 
+    public String venmoLink;
+
+    public Integer groupCost;
+
 }

@@ -19,6 +19,10 @@ public class GroupDto {
     private String icon;
 
     private int memberCount;
+
+    private String venmoLink;
+
+    private Integer cost;
     
 
 }

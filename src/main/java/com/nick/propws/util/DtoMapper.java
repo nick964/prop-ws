@@ -43,6 +43,8 @@ public class DtoMapper {
         groupDto.setIcon(g.getIcon());
         groupDto.setId(g.getId());
         groupDto.setMemberCount(g.getMembers().size());
+        groupDto.setVenmoLink(g.getVenmoLink());
+        groupDto.setCost(g.getGroupCost());
         return groupDto;
     }
 

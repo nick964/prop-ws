@@ -67,7 +67,6 @@ public class MemberServiceImpl implements  MemberService{
     @Override
     @Transactional
     public SubmissionResponse trackResponse(User user, Long groupId) throws PropSheetException {
-        masterAnswerService.updateAnswers();
         List<Member> members = user.getMembers()
                 .stream()
                 .filter(member -> member.getGroup().getId().intValue() == groupId)
@@ -84,17 +83,13 @@ public class MemberServiceImpl implements  MemberService{
             res.add(trackResponse);
         }
         int position = groupService.getMemberPositionInGroup(member.getId(), member.getGroup());
-        int score = 0;
-        for(TrackResponse trackResponse : res) {
-            if(trackResponse.isCorrect()) {
-                score++;
-            }
-        }
+
         GroupDetailsResponse groupDetailsResponse = groupService.getGroupDetail(groupId);
         SubmissionResponse response = new SubmissionResponse();
         response.setResponses(res);
         response.setPosition(position);
-        response.setTotalScore(score);
+        int totalScore = member.getScore() != null ? member.getScore().intValue() : 0;
+        response.setTotalScore(totalScore);
         response.setGroupDetails(groupDetailsResponse);
         return  response;
     }
