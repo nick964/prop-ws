@@ -2,6 +2,7 @@ package com.nick.propws.service;
 
 
 import com.nick.propws.dto.UploadFileDto;
+import lombok.extern.log4j.Log4j2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
 
 import java.io.IOException;
 
+@Log4j2
 @Service
 public class StorageServiceImpl implements StoreService{
 
@@ -37,6 +39,7 @@ public class StorageServiceImpl implements StoreService{
     public UploadFileDto uploadFile(MultipartFile file) {
         UploadFileDto fileDto = new UploadFileDto();
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        log.info("Running uploadFile - " + fileName);
         fileDto.setObjectName(fileName);
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -48,7 +51,12 @@ public class StorageServiceImpl implements StoreService{
             fileDto.setIconUrl("https://" + bucketName + ".s3.amazonaws.com/" + fileName);
             return fileDto;
         } catch (IOException e) {
-
+            log.error("Error while uploading file - " + fileName, e);
+            log.error(e.getMessage());
+            throw new RuntimeException("Error during file upload", e);
+        } catch (Exception e) {
+            log.error("Error while uploading file - Unhandled - " + fileName, e);
+            log.error(e.getMessage());
             throw new RuntimeException("Error during file upload", e);
         }
     }

@@ -71,6 +71,8 @@ public class SecurityConfiguration {
                         .requestMatchers(antMatcher("/api/auth/**")).permitAll()
                         .requestMatchers(antMatcher("/actuator/**")).permitAll()
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(antMatcher("/reset-password/**")).permitAll()
+                        .requestMatchers(antMatcher("/reset-password")).permitAll()
                         .anyRequest().authenticated() )
                 .sessionManagement(
                                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

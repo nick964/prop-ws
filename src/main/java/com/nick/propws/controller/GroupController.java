@@ -51,6 +51,7 @@ public class GroupController {
             createGroupReq.setDescription(description);
             createGroupReq.setIcon(picture);
             createGroupReq.setVenmoLink(venmoLink);
+            createGroupReq.setGroupCost(groupCost);
             return ResponseEntity.ok(groupService.createGroup(createGroupReq, userName));
         } catch (Exception e) {
             logger.error("Error occurred during group upload");
@@ -108,5 +109,36 @@ public class GroupController {
     @GetMapping("/leaderboard")
     public @ResponseBody ResponseEntity<GroupResultsResponse> getLeaderboard() {
         return ResponseEntity.ok(groupService.getGlobalLeaderboard());
+    }
+
+    @PostMapping("/update")
+    public @ResponseBody ResponseEntity<OperationResponseDto> updateGroup(
+            @RequestParam(value="id") Long id,
+            @RequestParam(value="name", required = false) String name,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestPart(value = "groupIcon", required = false) MultipartFile picture,
+            @RequestParam(value = "venmoLink", required = false) String venmoLink,
+            @RequestParam(value = "groupCost", required = false) Integer groupCost) {
+        logger.info("Received request for group update for group " + id);
+        OperationResponseDto res = new OperationResponseDto();
+        res.setStatus("SUCCESS");
+        res.setMessage("Group updated successfully");
+        try {
+            UpdateGroupReq updateGroupReq = new UpdateGroupReq();
+            updateGroupReq.setId(id);
+            updateGroupReq.setName(name);
+            updateGroupReq.setDescription(description);
+            updateGroupReq.setIcon(picture);
+            updateGroupReq.setVenmoLink(venmoLink);
+            updateGroupReq.setGroupCost(groupCost);
+            groupService.updateGroup(updateGroupReq);
+            return ResponseEntity.ok(res);
+        } catch (Exception e) {
+            logger.error("Error occurred during group update for group " + id);
+            logger.error(e.getMessage());
+            res.setStatus("ERROR");
+            res.setMessage("Error occurred during group update for group " + e.getMessage());
+            return ResponseEntity.badRequest().body(res);
+        }
     }
 }

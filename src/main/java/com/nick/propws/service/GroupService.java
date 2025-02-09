@@ -13,6 +13,8 @@ public interface GroupService {
 
     CreateGroupResponse createGroup(CreateGroupReq createGroupReq, String email);
 
+    void updateGroup(UpdateGroupReq updateGroupReq);
+
     void addUserToGroup(User user, String groupId) throws PropSheetException;
 
     GroupDetailsResponse getGroupDetail(Long groupId) throws PropSheetException;

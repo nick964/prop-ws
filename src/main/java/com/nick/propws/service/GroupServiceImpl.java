@@ -89,6 +89,25 @@ public class GroupServiceImpl implements GroupService{
     }
 
     @Override
+    public void updateGroup(UpdateGroupReq updateGroupReq) {
+        Optional<Group> group = groupRepository.findById(updateGroupReq.getId());
+        if(group.isPresent()) {
+            Group g = group.get();
+            g.setName(StringUtils.hasText(updateGroupReq.getName()) ? updateGroupReq.getName() : g.getName());
+            g.setDescription(StringUtils.hasText(updateGroupReq.getDescription()) ? updateGroupReq.getDescription() : g.getDescription());
+            g.setVenmoLink(StringUtils.hasText(updateGroupReq.getVenmoLink()) ? updateGroupReq.getVenmoLink() : g.getVenmoLink());
+            g.setGroupCost(updateGroupReq.getGroupCost() == null ? g.getGroupCost() : updateGroupReq.getGroupCost());
+            if(updateGroupReq.getIcon() != null) {
+                UploadFileDto groupIcon = storeService.uploadFile(updateGroupReq.getIcon());
+                g.setIcon(groupIcon.getIconUrl());
+            }
+            groupRepository.save(g);
+        } else {
+            throw new PropSheetException("Group not found");
+        }
+    }
+
+    @Override
     public void addUserToGroup(User user, String groupId){
         Long gId = Long.valueOf(groupId);
         Optional<Group> g = groupRepository.findById(gId);
@@ -293,6 +312,8 @@ public class GroupServiceImpl implements GroupService{
         details.setName(g.getName());
         details.setDescription(g.getDescription());
         details.setIcon(g.getIcon());
+        details.setVenmoLink(g.getVenmoLink());
+        details.setGroupCost(g.getGroupCost());
         if(g.getMembers() != null && !g.getMembers().isEmpty()) {
             Member admin = g.getMembers().stream().filter(Member::isGroupAdmin).findFirst().orElse(null);
             if(admin != null) {

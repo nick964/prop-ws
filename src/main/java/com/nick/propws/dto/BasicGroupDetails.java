@@ -25,6 +25,9 @@ public class BasicGroupDetails {
 
     public int memberCount;
 
+    public String venmoLink;
+    public Integer groupCost;
+
     public MemberDto admin;
 
 }

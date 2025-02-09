@@ -35,7 +35,6 @@ public class ScoreUpdateServiceImpl implements ScoreUpdateService {
                     "WHERE EXISTS (SELECT 1 FROM master_answers m WHERE m.question_id = ma.question_id)";
 
             int updatedCount = entityManager.createNativeQuery(sql).executeUpdate();
-            log.info(updatedCount + " member answers updated successfully");
 
             String updateMemberSql = "UPDATE members m " +
                     "SET m.score = (" +
@@ -45,7 +44,6 @@ public class ScoreUpdateServiceImpl implements ScoreUpdateService {
                     ")";
 
             int updatedMemberCount = entityManager.createNativeQuery(updateMemberSql).executeUpdate();
-            log.info(updatedMemberCount + " members total scores updated successfully");
         } catch (Exception e) {
             log.error("Error updating member ScoreUpdateServiceImpl", e);
         }
