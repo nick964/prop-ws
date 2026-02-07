@@ -11,22 +11,14 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
+@Profile("local")
 public class S3Config {
 
     @Bean
-    @Profile("local")
     public S3Client s3ClientLocal(@Value("${cloud.aws.credentials.accessKey}") String accessKey,
                                   @Value("${cloud.aws.credentials.secretKey}") String secretKey) {
         return S3Client.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
-                .region(Region.US_EAST_1).build();
-    }
-
-    @Bean
-    @Profile("!local")
-    public S3Client s3ClientProd() {
-        return S3Client.builder()
-                .credentialsProvider(DefaultCredentialsProvider.create())
                 .region(Region.US_EAST_1).build();
     }
 

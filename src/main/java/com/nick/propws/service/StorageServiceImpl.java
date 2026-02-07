@@ -18,6 +18,7 @@ import java.io.IOException;
 
 @Log4j2
 @Service
+@org.springframework.context.annotation.Profile("local")
 public class StorageServiceImpl implements StoreService{
 
     Logger logger = LoggerFactory.getLogger(StorageServiceImpl.class);
