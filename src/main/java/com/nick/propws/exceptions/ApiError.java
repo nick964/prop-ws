@@ -9,6 +9,7 @@ public class ApiError {
 
     public ApiError(Integer errorCode, String errorDesc, Date date) {
         super();
+        
         this.errorCode = errorCode;
         this.errorDesc = errorDesc;
         this.date = date;
